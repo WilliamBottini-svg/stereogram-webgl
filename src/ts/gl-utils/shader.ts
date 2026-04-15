@@ -1,4 +1,4 @@
-﻿import { GLResource } from "./gl-resource";
+import { GLResource } from "./gl-resource";
 import { VBO } from "./vbo";
 
 function notImplemented(): void {

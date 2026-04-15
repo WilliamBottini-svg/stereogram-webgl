@@ -261,6 +261,56 @@ const data = {
             ]
         },
         {
+            title: "Pattern placement",
+            controls: [
+                {
+                    type: Demopage.supportedControls.Range,
+                    title: "Offset X",
+                    id: "tile-pattern-offset-x-range-id",
+                    min: -0.5,
+                    max: 0.5,
+                    value: 0,
+                    step: 0.01
+                },
+                {
+                    type: Demopage.supportedControls.Range,
+                    title: "Offset Y",
+                    id: "tile-pattern-offset-y-range-id",
+                    min: -0.5,
+                    max: 0.5,
+                    value: 0,
+                    step: 0.01
+                },
+                {
+                    type: Demopage.supportedControls.Range,
+                    title: "Zoom",
+                    id: "tile-pattern-zoom-range-id",
+                    min: 0.25,
+                    max: 4,
+                    value: 1,
+                    step: 0.01
+                },
+                {
+                    type: Demopage.supportedControls.Range,
+                    title: "Repeat scale X",
+                    id: "tile-pattern-repeat-x-range-id",
+                    min: 0.5,
+                    max: 2,
+                    value: 1,
+                    step: 0.01
+                },
+                {
+                    type: Demopage.supportedControls.Range,
+                    title: "Repeat scale Y",
+                    id: "tile-pattern-repeat-y-range-id",
+                    min: 0.5,
+                    max: 2,
+                    value: 1,
+                    step: 0.01
+                },
+            ]
+        },
+        {
             title: "Stripes",
             controls: [
                 {
@@ -278,7 +328,24 @@ const data = {
                             label: "Middle (beta)",
                             checked: true,
                         },
+                        {
+                            value: "right",
+                            label: "Right",
+                        },
+                        {
+                            value: "custom",
+                            label: "Custom",
+                        },
                     ]
+                },
+                {
+                    type: Demopage.supportedControls.Range,
+                    title: "Custom position",
+                    id: "main-stripe-custom-range-id",
+                    min: 0,
+                    max: 1000,
+                    value: 500,
+                    step: 1
                 },
                 {
                     type: Demopage.supportedControls.Tabs,

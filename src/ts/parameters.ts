@@ -12,6 +12,11 @@ const controlId = {
     TILE_NOISE_COLORED: "tile-noise-colored-checkbox-id",
     SHOW_UV: "show-uv-checkbox-id",
     TILE_UPLOAD_BUTTON: "input-tile-upload-button",
+    TILE_PATTERN_OFFSET_X: "tile-pattern-offset-x-range-id",
+    TILE_PATTERN_OFFSET_Y: "tile-pattern-offset-y-range-id",
+    TILE_PATTERN_ZOOM: "tile-pattern-zoom-range-id",
+    TILE_PATTERN_REPEAT_X: "tile-pattern-repeat-x-range-id",
+    TILE_PATTERN_REPEAT_Y: "tile-pattern-repeat-y-range-id",
 
     HEIGHTMAP_MODE_TABS: "heightmap-mode-tabs-id",
     HEIGHTMAP_PRESET_SELECT: "heightmap-preset-select-id",
@@ -22,6 +27,7 @@ const controlId = {
     HEIGHTMAP_UPLOAD_BUTTON: "input-heightmap-upload-button",
 
     STRIPES_MAIN_TABS: "main-stripe-tabs-id",
+    STRIPES_MAIN_CUSTOM_RANGE: "main-stripe-custom-range-id",
     STRIPES_MODE_TABS: "stripes-mode-tabs-id",
     STRIPES_WIDTH_RANGE: "stripes-width-range-id",
     STRIPES_COUNT_RANGE: "stripes-count-range-id",
@@ -61,6 +67,8 @@ enum EHeightmapMode {
 enum EMainStripe {
     LEFT = "left",
     MIDDLE = "middle",
+    RIGHT = "right",
+    CUSTOM = "custom",
 }
 
 enum EStripesMode {
@@ -120,6 +128,27 @@ abstract class Parameters {
     }
     public static get stripesWidth(): number {
         return Page.Range.getValue(controlId.STRIPES_WIDTH_RANGE);
+    }
+
+    /** 0..1 normalized position along stripe columns; used when main stripe is Custom */
+    public static get mainStripeNormalized(): number {
+        return Page.Range.getValue(controlId.STRIPES_MAIN_CUSTOM_RANGE) / 1000;
+    }
+
+    public static get tilePatternOffsetX(): number {
+        return Page.Range.getValue(controlId.TILE_PATTERN_OFFSET_X);
+    }
+    public static get tilePatternOffsetY(): number {
+        return Page.Range.getValue(controlId.TILE_PATTERN_OFFSET_Y);
+    }
+    public static get tilePatternZoom(): number {
+        return Page.Range.getValue(controlId.TILE_PATTERN_ZOOM);
+    }
+    public static get tilePatternRepeatX(): number {
+        return Page.Range.getValue(controlId.TILE_PATTERN_REPEAT_X);
+    }
+    public static get tilePatternRepeatY(): number {
+        return Page.Range.getValue(controlId.TILE_PATTERN_REPEAT_Y);
     }
 }
 
@@ -241,12 +270,22 @@ Page.Range.addObserver(controlId.TILE_NOISE_RESOLUTION, callRecomputeNoiseTileOb
 Page.Checkbox.addObserver(controlId.TILE_NOISE_SQUARE, callRecomputeNoiseTileObservers);
 Page.Checkbox.addObserver(controlId.TILE_NOISE_COLORED, callRecomputeNoiseTileObservers);
 
+Page.Range.addObserver(controlId.TILE_PATTERN_OFFSET_X, callRedrawObservers);
+Page.Range.addObserver(controlId.TILE_PATTERN_OFFSET_Y, callRedrawObservers);
+Page.Range.addObserver(controlId.TILE_PATTERN_ZOOM, callRedrawObservers);
+Page.Range.addObserver(controlId.TILE_PATTERN_REPEAT_X, callRedrawObservers);
+Page.Range.addObserver(controlId.TILE_PATTERN_REPEAT_Y, callRedrawObservers);
+
 
 {
     const updateStripesControlsVisibility = () => {
         const isAdaptativeMode = Parameters.stripesMode === EStripesMode.ADAPTATIVE;
         Page.Controls.setVisibility(controlId.STRIPES_COUNT_RANGE, !isAdaptativeMode);
         Page.Controls.setVisibility(controlId.STRIPES_WIDTH_RANGE, isAdaptativeMode);
+        Page.Controls.setVisibility(
+            controlId.STRIPES_MAIN_CUSTOM_RANGE,
+            Parameters.mainStripe === EMainStripe.CUSTOM,
+        );
     };
     const onStripesChange = () => {
         updateStripesControlsVisibility();
@@ -256,6 +295,7 @@ Page.Checkbox.addObserver(controlId.TILE_NOISE_COLORED, callRecomputeNoiseTileOb
     Page.Tabs.addObserver(controlId.STRIPES_MODE_TABS, onStripesChange);
     Page.Range.addObserver(controlId.STRIPES_COUNT_RANGE, onStripesChange);
     Page.Range.addObserver(controlId.STRIPES_WIDTH_RANGE, onStripesChange);
+    Page.Range.addObserver(controlId.STRIPES_MAIN_CUSTOM_RANGE, onStripesChange);
     updateStripesControlsVisibility();
 }
 

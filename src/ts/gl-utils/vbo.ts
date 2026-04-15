@@ -1,4 +1,4 @@
-﻿import { GLResource } from "./gl-resource";
+import { GLResource } from "./gl-resource";
 
 enum Usage {
     DYNAMIC,

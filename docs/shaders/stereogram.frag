@@ -5,10 +5,14 @@ uniform sampler2D uTileTexture;
 uniform float uTileColor;
 uniform float uTileHeight;
 uniform vec2 uTileScaling;
+uniform vec2 uTileOffset;
+uniform float uTileZoom;
+uniform vec2 uTileRepeatScale;
 uniform float uShowUV;
 uniform float uMainStripe;
 
-varying vec2 vPosition;uniform sampler2D uHeightmapTexture;
+varying vec2 vPosition;
+uniform sampler2D uHeightmapTexture;
 
 uniform float uDepthFactor;
 uniform float uInvertHeightmap;
@@ -54,13 +58,19 @@ vec2 computeTileUv(vec2 position) {
     return position;
 }
 
+// Pan/zoom applied in texture space; clamp to the useful (cropped) area — offsets that push
+// outside that rect will stick at the edge (tile uses clamp-to-edge sampling).
 vec4 sampleTile(vec2 coords) {
-    coords = 0.5 + (coords - 0.5) * uTileScaling;
+    vec2 zoomed = uTileScaling * uTileZoom;
+    coords = 0.5 + (coords - 0.5) * zoomed;
+    coords += uTileOffset;
+    vec2 he = 0.5 * abs(zoomed);
+    coords = clamp(coords, vec2(0.5) - he, vec2(0.5) + he);
     return texture2D(uTileTexture, coords);
 }
 
 void main(void) {
-    vec2 tileUv = computeTileUv(vPosition);
+    vec2 tileUv = computeTileUv(vPosition) * uTileRepeatScale;
 
     vec4 tileSample = sampleTile(tileUv);
     vec4 monocolorTile = vec4(vec3(tileSample.r), 1);

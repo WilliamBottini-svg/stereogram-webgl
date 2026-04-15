@@ -258,6 +258,133 @@
           </section>
           <hr />
           <section class="controls-section">
+            <h2>Pattern placement</h2>
+
+            <div class="controls-list">
+              <div class="control" id="control-tile-pattern-offset-x-range-id">
+                <label>Offset X:</label>
+                <div class="range-container">
+                  <input type="range" min="-0.5" max="0.5" value="0" step="0.01" class="slider" id="tile-pattern-offset-x-range-id">
+                  <div class="range-skin-container">
+                    <div class="range-stub">
+                      <span class="range-bar range-bar-left range-stub-left"></span>
+                    </div>
+                    <div class="range-progress">
+                      <div class="range-progress-left">
+                        <span class="range-bar range-bar-left"></span>
+                        <span class="range-handle"></span>
+                        <output for="tile-pattern-offset-x-range-id" class="range-tooltip"></output>
+                      </div>
+                      <div class="range-progress-right">
+                        <span class="range-bar range-bar-right"></span>
+                      </div>
+                    </div>
+                    <div class="range-stub">
+                      <span class="range-bar range-bar-right range-stub-right"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="control" id="control-tile-pattern-offset-y-range-id">
+                <label>Offset Y:</label>
+                <div class="range-container">
+                  <input type="range" min="-0.5" max="0.5" value="0" step="0.01" class="slider" id="tile-pattern-offset-y-range-id">
+                  <div class="range-skin-container">
+                    <div class="range-stub">
+                      <span class="range-bar range-bar-left range-stub-left"></span>
+                    </div>
+                    <div class="range-progress">
+                      <div class="range-progress-left">
+                        <span class="range-bar range-bar-left"></span>
+                        <span class="range-handle"></span>
+                        <output for="tile-pattern-offset-y-range-id" class="range-tooltip"></output>
+                      </div>
+                      <div class="range-progress-right">
+                        <span class="range-bar range-bar-right"></span>
+                      </div>
+                    </div>
+                    <div class="range-stub">
+                      <span class="range-bar range-bar-right range-stub-right"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="control" id="control-tile-pattern-zoom-range-id">
+                <label>Zoom:</label>
+                <div class="range-container">
+                  <input type="range" min="0.25" max="4" value="1" step="0.01" class="slider" id="tile-pattern-zoom-range-id">
+                  <div class="range-skin-container">
+                    <div class="range-stub">
+                      <span class="range-bar range-bar-left range-stub-left"></span>
+                    </div>
+                    <div class="range-progress">
+                      <div class="range-progress-left">
+                        <span class="range-bar range-bar-left"></span>
+                        <span class="range-handle"></span>
+                        <output for="tile-pattern-zoom-range-id" class="range-tooltip"></output>
+                      </div>
+                      <div class="range-progress-right">
+                        <span class="range-bar range-bar-right"></span>
+                      </div>
+                    </div>
+                    <div class="range-stub">
+                      <span class="range-bar range-bar-right range-stub-right"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="control" id="control-tile-pattern-repeat-x-range-id">
+                <label>Repeat scale X:</label>
+                <div class="range-container">
+                  <input type="range" min="0.5" max="2" value="1" step="0.01" class="slider" id="tile-pattern-repeat-x-range-id">
+                  <div class="range-skin-container">
+                    <div class="range-stub">
+                      <span class="range-bar range-bar-left range-stub-left"></span>
+                    </div>
+                    <div class="range-progress">
+                      <div class="range-progress-left">
+                        <span class="range-bar range-bar-left"></span>
+                        <span class="range-handle"></span>
+                        <output for="tile-pattern-repeat-x-range-id" class="range-tooltip"></output>
+                      </div>
+                      <div class="range-progress-right">
+                        <span class="range-bar range-bar-right"></span>
+                      </div>
+                    </div>
+                    <div class="range-stub">
+                      <span class="range-bar range-bar-right range-stub-right"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="control" id="control-tile-pattern-repeat-y-range-id">
+                <label>Repeat scale Y:</label>
+                <div class="range-container">
+                  <input type="range" min="0.5" max="2" value="1" step="0.01" class="slider" id="tile-pattern-repeat-y-range-id">
+                  <div class="range-skin-container">
+                    <div class="range-stub">
+                      <span class="range-bar range-bar-left range-stub-left"></span>
+                    </div>
+                    <div class="range-progress">
+                      <div class="range-progress-left">
+                        <span class="range-bar range-bar-left"></span>
+                        <span class="range-handle"></span>
+                        <output for="tile-pattern-repeat-y-range-id" class="range-tooltip"></output>
+                      </div>
+                      <div class="range-progress-right">
+                        <span class="range-bar range-bar-right"></span>
+                      </div>
+                    </div>
+                    <div class="range-stub">
+                      <span class="range-bar range-bar-right range-stub-right"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+          <hr />
+          <section class="controls-section">
             <h2>Stripes</h2>
 
             <div class="controls-list">
@@ -268,6 +395,34 @@
                   <label for="main-stripe-tabs-id-left-id">Left</label>
                   <input type="radio" name="main-stripe-tabs-id" value="middle" id="main-stripe-tabs-id-middle-id" checked />
                   <label for="main-stripe-tabs-id-middle-id">Middle (beta)</label>
+                  <input type="radio" name="main-stripe-tabs-id" value="right" id="main-stripe-tabs-id-right-id" />
+                  <label for="main-stripe-tabs-id-right-id">Right</label>
+                  <input type="radio" name="main-stripe-tabs-id" value="custom" id="main-stripe-tabs-id-custom-id" />
+                  <label for="main-stripe-tabs-id-custom-id">Custom</label>
+                </div>
+              </div>
+              <div class="control" id="control-main-stripe-custom-range-id" style="display: none">
+                <label>Custom position:</label>
+                <div class="range-container">
+                  <input type="range" min="0" max="1000" value="500" step="1" class="slider" id="main-stripe-custom-range-id">
+                  <div class="range-skin-container">
+                    <div class="range-stub">
+                      <span class="range-bar range-bar-left range-stub-left"></span>
+                    </div>
+                    <div class="range-progress">
+                      <div class="range-progress-left">
+                        <span class="range-bar range-bar-left"></span>
+                        <span class="range-handle"></span>
+                        <output for="main-stripe-custom-range-id" class="range-tooltip"></output>
+                      </div>
+                      <div class="range-progress-right">
+                        <span class="range-bar range-bar-right"></span>
+                      </div>
+                    </div>
+                    <div class="range-stub">
+                      <span class="range-bar range-bar-right range-stub-right"></span>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div class="control" id="control-stripes-mode-tabs-id">

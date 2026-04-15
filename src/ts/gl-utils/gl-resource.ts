@@ -1,4 +1,4 @@
-﻿abstract class GLResource {
+abstract class GLResource {
     private _gl: WebGLRenderingContext;
 
     constructor(gl: WebGLRenderingContext) {
