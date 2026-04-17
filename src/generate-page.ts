@@ -400,6 +400,29 @@ const data = {
                     checked: false,
                 },
                 {
+                    type: Demopage.supportedControls.Tabs,
+                    title: "Fullscreen preview",
+                    id: "preview-fit-tabs-id",
+                    unique: true,
+                    options: [
+                        {
+                            label: "Square",
+                            value: "square",
+                            checked: true,
+                        },
+                        {
+                            label: "Fill screen",
+                            value: "fill",
+                        },
+                    ],
+                },
+                {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "Use browser fullscreen",
+                    id: "browser-fullscreen-preview-checkbox-id",
+                    checked: false,
+                },
+                {
                     type: Demopage.supportedControls.FileDownload,
                     id: "image-download-id",
                     label: "Download image"

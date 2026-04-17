@@ -5,6 +5,7 @@ import { Engine } from "./engine";
 import { Heightmap } from "./heightmap";
 import { EHeightmapMode, ETileMode, Parameters } from "./parameters";
 import { Tile } from "./tile";
+import { initBrowserFullscreenPreview } from "./fullscreen-preview";
 
 import "./page-interface-generated";
 
@@ -30,6 +31,8 @@ function main(): void {
     const engine = new Engine();
     const heightmap = new Heightmap();
     const tile = new Tile();
+
+    initBrowserFullscreenPreview();
 
     let nbFramesSinceLastUpdate = 0;
     setInterval(() => {

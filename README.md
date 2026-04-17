@@ -7,6 +7,24 @@ In this project, you can use your own depth map, customize the tiles as well as 
 
 See it live [here](https://piellardj.github.io/stereogram-webgl/).
 
+## Run locally
+
+1. Install [Node.js](https://nodejs.org/) **18.16 or newer** (see `engines` in `package.json`).
+2. In the project folder, install dependencies and build the site:
+
+   ```bash
+   npm install
+   npm run build
+   ```
+
+3. Start a local server and open **http://localhost:8080** in your browser:
+
+   ```bash
+   npm run http-server
+   ```
+
+To rebuild after you change source files, run `npm run build` again (or use `npm run webpack:watch` in another terminal while `http-server` stays running).
+
 See my Magic Eye solver [here](https://piellardj.github.io/stereogram-solver/).
 
 [![Donate](https://raw.githubusercontent.com/piellardj/piellardj.github.io/master/images/readme/donate-paypal.svg)](https://www.paypal.com/donate/?hosted_button_id=AF7H7GEJTL95E)
