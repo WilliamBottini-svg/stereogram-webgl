@@ -81,6 +81,14 @@ class Engine {
                 shader.u["uTileOffset"].value = [Parameters.tilePatternOffsetX, Parameters.tilePatternOffsetY];
                 shader.u["uTileZoom"].value = Parameters.tilePatternZoom;
                 shader.u["uTileRepeatScale"].value = [Parameters.tilePatternRepeatX, Parameters.tilePatternRepeatY];
+                const isTextureMode = Parameters.tileMode === ETileMode.TEXTURE;
+                const eps = 1e-3;
+                const cropMinU = isTextureMode ? Math.min(Parameters.tileCropMinU, Parameters.tileCropMaxU - eps) : 0;
+                const cropMaxU = isTextureMode ? Math.max(Parameters.tileCropMaxU, Parameters.tileCropMinU + eps) : 1;
+                const cropMinV = isTextureMode ? Math.min(Parameters.tileCropMinV, Parameters.tileCropMaxV - eps) : 0;
+                const cropMaxV = isTextureMode ? Math.max(Parameters.tileCropMaxV, Parameters.tileCropMinV + eps) : 1;
+                shader.u["uTileCropMin"].value = [cropMinU, cropMinV];
+                shader.u["uTileCropMax"].value = [cropMaxU, cropMaxV];
                 shader.u["uShowUV"].value = Parameters.showUV ? 1 : 0;
                 shader.u["uMainStripe"].value = Engine.computeMainStripeIndex(this.stripesCount);
             }

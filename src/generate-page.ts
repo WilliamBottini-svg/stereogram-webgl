@@ -311,6 +311,47 @@ const data = {
             ]
         },
         {
+            title: "Pattern crop",
+            controls: [
+                {
+                    type: Demopage.supportedControls.Range,
+                    title: "Left",
+                    id: "tile-crop-min-u-range-id",
+                    min: 0,
+                    max: 1,
+                    value: 0,
+                    step: 0.01
+                },
+                {
+                    type: Demopage.supportedControls.Range,
+                    title: "Right",
+                    id: "tile-crop-max-u-range-id",
+                    min: 0,
+                    max: 1,
+                    value: 1,
+                    step: 0.01
+                },
+                {
+                    type: Demopage.supportedControls.Range,
+                    title: "Top",
+                    id: "tile-crop-min-v-range-id",
+                    min: 0,
+                    max: 1,
+                    value: 0,
+                    step: 0.01
+                },
+                {
+                    type: Demopage.supportedControls.Range,
+                    title: "Bottom",
+                    id: "tile-crop-max-v-range-id",
+                    min: 0,
+                    max: 1,
+                    value: 1,
+                    step: 0.01
+                },
+            ]
+        },
+        {
             title: "Stripes",
             controls: [
                 {

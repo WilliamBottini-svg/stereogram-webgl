@@ -11,7 +11,7 @@
     <link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16">
     <link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32">
     <link rel="icon" type="image/png" href="favicon-96x96.png" sizes="96x96">
-    <link rel="stylesheet" type="text/css" href="css/page.css?v=2024-02-11T15%3A01%3A41.623Z">
+    <link rel="stylesheet" type="text/css" href="css/page.css?v=2026-04-17T20%3A36%3A40.309Z">
   </head>
 
   <body>
@@ -30,6 +30,20 @@
         <p>Autostereograms were very popular in the '90s. They take advantage of stereopsis: the brain tries to reconstruct depth by combining the two slightly different images perceived by each eye.</p>
         <p>In this project, you can use your own depth map, customize the tiles as well as the way the image is computed. It all runs on GPU and can also handle live moving scenes in real time.</p>
         <p>See it live <a href="https://piellardj.github.io/stereogram-webgl/">here</a>.</p>
+        <h2 id="runlocally">Run locally</h2>
+        <ol>
+          <li>Install <a href="https://nodejs.org/">Node.js</a> <strong>18.16 or newer</strong> (see <code>engines</code> in <code>package.json</code>).</li>
+          <li>In the project folder, install dependencies and build the site:</li>
+        </ol>
+        <pre><code class="bash language-bash">   npm install
+   npm run build
+</code></pre>
+        <ol start="3">
+          <li>Start a local server and open <strong>http://localhost:8080</strong> in your browser:</li>
+        </ol>
+        <pre><code class="bash language-bash">   npm run http-server
+</code></pre>
+        <p>To rebuild after you change source files, run <code>npm run build</code> again (or use <code>npm run webpack:watch</code> in another terminal while <code>http-server</code> stays running).</p>
         <p>See my Magic Eye solver <a href="https://piellardj.github.io/stereogram-solver/">here</a>.</p>
         <p><a href="https://www.paypal.com/donate/?hosted_button_id=AF7H7GEJTL95E"><img src="https://raw.githubusercontent.com/piellardj/piellardj.github.io/master/images/readme/donate-paypal.svg" alt="Donate" /></a></p>
         <h2 id="preview">Preview</h2>

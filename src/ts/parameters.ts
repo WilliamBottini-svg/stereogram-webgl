@@ -17,6 +17,10 @@ const controlId = {
     TILE_PATTERN_ZOOM: "tile-pattern-zoom-range-id",
     TILE_PATTERN_REPEAT_X: "tile-pattern-repeat-x-range-id",
     TILE_PATTERN_REPEAT_Y: "tile-pattern-repeat-y-range-id",
+    TILE_CROP_MIN_U: "tile-crop-min-u-range-id",
+    TILE_CROP_MAX_U: "tile-crop-max-u-range-id",
+    TILE_CROP_MIN_V: "tile-crop-min-v-range-id",
+    TILE_CROP_MAX_V: "tile-crop-max-v-range-id",
 
     HEIGHTMAP_MODE_TABS: "heightmap-mode-tabs-id",
     HEIGHTMAP_PRESET_SELECT: "heightmap-preset-select-id",
@@ -150,6 +154,19 @@ abstract class Parameters {
     public static get tilePatternRepeatY(): number {
         return Page.Range.getValue(controlId.TILE_PATTERN_REPEAT_Y);
     }
+
+    public static get tileCropMinU(): number {
+        return Page.Range.getValue(controlId.TILE_CROP_MIN_U);
+    }
+    public static get tileCropMaxU(): number {
+        return Page.Range.getValue(controlId.TILE_CROP_MAX_U);
+    }
+    public static get tileCropMinV(): number {
+        return Page.Range.getValue(controlId.TILE_CROP_MIN_V);
+    }
+    public static get tileCropMaxV(): number {
+        return Page.Range.getValue(controlId.TILE_CROP_MAX_V);
+    }
 }
 
 function parseImageUpload(filesList: FileList, callback: (uploadedImage: HTMLImageElement) => unknown): void {
@@ -186,6 +203,10 @@ function updateControlsVisibility(): void {
     Page.Controls.setVisibility(controlId.TILE_NOISE_SQUARE, isTileNoiseMode);
     Page.Controls.setVisibility(controlId.TILE_PRESET_SELECT, !isTileNoiseMode);
     Page.Controls.setVisibility(controlId.TILE_UPLOAD_BUTTON, !isTileNoiseMode);
+    Page.Controls.setVisibility(controlId.TILE_CROP_MIN_U, !isTileNoiseMode);
+    Page.Controls.setVisibility(controlId.TILE_CROP_MAX_U, !isTileNoiseMode);
+    Page.Controls.setVisibility(controlId.TILE_CROP_MIN_V, !isTileNoiseMode);
+    Page.Controls.setVisibility(controlId.TILE_CROP_MAX_V, !isTileNoiseMode);
 
     const isMovingMode = (Parameters.heightmapMode === EHeightmapMode.MOVING);
     Page.Controls.setVisibility(controlId.HEIGHTMAP_PRESET_SELECT, !isMovingMode);
@@ -241,12 +262,20 @@ Page.Tabs.addObserver(controlId.TILE_MODE_TABS, () => {
     callRedrawObservers();
 });
 {
+    const resetTileCrop = () => {
+        Page.Range.setValue(controlId.TILE_CROP_MIN_U, 0);
+        Page.Range.setValue(controlId.TILE_CROP_MAX_U, 1);
+        Page.Range.setValue(controlId.TILE_CROP_MIN_V, 0);
+        Page.Range.setValue(controlId.TILE_CROP_MAX_V, 1);
+    };
+
     const onNewTileTexture = (onlyIfPresetIs: string | null, image: HTMLImageElement) => {
         const preset = Page.Select.getValue(controlId.TILE_PRESET_SELECT);
         if (preset === onlyIfPresetIs) { // this method is call asynchronously, so check that the current preset is still the same
             for (const observer of Parameters.tileChangeObservers) {
                 observer(image);
             }
+            resetTileCrop();
             callRedrawObservers();
         }
     };
@@ -275,6 +304,11 @@ Page.Range.addObserver(controlId.TILE_PATTERN_OFFSET_Y, callRedrawObservers);
 Page.Range.addObserver(controlId.TILE_PATTERN_ZOOM, callRedrawObservers);
 Page.Range.addObserver(controlId.TILE_PATTERN_REPEAT_X, callRedrawObservers);
 Page.Range.addObserver(controlId.TILE_PATTERN_REPEAT_Y, callRedrawObservers);
+
+Page.Range.addObserver(controlId.TILE_CROP_MIN_U, callRedrawObservers);
+Page.Range.addObserver(controlId.TILE_CROP_MAX_U, callRedrawObservers);
+Page.Range.addObserver(controlId.TILE_CROP_MIN_V, callRedrawObservers);
+Page.Range.addObserver(controlId.TILE_CROP_MAX_V, callRedrawObservers);
 
 
 {

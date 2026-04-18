@@ -8,6 +8,8 @@ uniform vec2 uTileScaling;
 uniform vec2 uTileOffset;
 uniform float uTileZoom;
 uniform vec2 uTileRepeatScale;
+uniform vec2 uTileCropMin;
+uniform vec2 uTileCropMax;
 uniform float uShowUV;
 uniform float uMainStripe;
 
@@ -45,6 +47,7 @@ vec2 computeTileUv(vec2 position) {
 // Pan/zoom applied in texture space; clamp to the useful (cropped) area — offsets that push
 // outside that rect will stick at the edge (tile uses clamp-to-edge sampling).
 vec4 sampleTile(vec2 coords) {
+    coords = mix(uTileCropMin, uTileCropMax, coords);
     vec2 zoomed = uTileScaling * uTileZoom;
     coords = 0.5 + (coords - 0.5) * zoomed;
     coords += uTileOffset;
