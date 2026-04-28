@@ -37,6 +37,7 @@ const controlId = {
     STRIPES_COUNT_RANGE: "stripes-count-range-id",
 
     SHOW_INDICATORS_CHECKBOX: "show-indicators-checkbox-id",
+    DOWNLOAD_SIZE_TABS: "download-size-tabs-id",
     IMAGE_DOWNLOAD: "image-download-id",
 };
 
@@ -166,6 +167,16 @@ abstract class Parameters {
     }
     public static get tileCropMaxV(): number {
         return Page.Range.getValue(controlId.TILE_CROP_MAX_V);
+    }
+
+    /** Longest side in pixels for PNG export (1024, 2048, or 4096). */
+    public static get downloadSize(): number {
+        const raw = Page.Tabs.getValues(controlId.DOWNLOAD_SIZE_TABS)[0];
+        const n = parseInt(String(raw), 10);
+        if (n === 1024 || n === 2048 || n === 4096) {
+            return n;
+        }
+        return 2048;
     }
 }
 

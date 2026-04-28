@@ -8,6 +8,7 @@ import { Tile } from "./tile";
 import { initBrowserFullscreenPreview } from "./fullscreen-preview";
 
 import "./page-interface-generated";
+import "./ui-enhancements";
 
 
 function main(): void {
@@ -58,9 +59,38 @@ function main(): void {
         nbFramesSinceLastUpdate++;
 
         if (needToDownload) {
-            // redraw before resizing the canvas because the download pane might open, which changes the canvas size
-            engine.draw(heightmap, tile); // redraw because preserveDrawingBuffer is false
-            download(canvas);
+            // Redraw at chosen export resolution; backing buffer is restored after toBlob (or immediately for IE).
+            const prevW = canvas.width;
+            const prevH = canvas.height;
+            let [expW, expH] = computeExportDimensions(canvas, Parameters.downloadSize);
+            [expW, expH] = clampExportToWebGLLimits(expW, expH);
+            canvas.width = expW;
+            canvas.height = expH;
+            engine.draw(heightmap, tile);
+
+            const name = "stereogram.png";
+            if ((canvas as any).msToBlob) {
+                const blob = (canvas as any).msToBlob();
+                (window.navigator as any).msSaveBlob(blob, name);
+                canvas.width = prevW;
+                canvas.height = prevH;
+                needToRedraw = true;
+            } else {
+                canvas.toBlob((blob: Blob | null) => {
+                    canvas.width = prevW;
+                    canvas.height = prevH;
+                    needToRedraw = true;
+                    if (!blob) {
+                        return;
+                    }
+                    const link = document.createElement("a");
+                    link.download = name;
+                    const url = URL.createObjectURL(blob);
+                    link.href = url;
+                    link.click();
+                    URL.revokeObjectURL(url);
+                });
+            }
             needToDownload = false;
         }
 
@@ -85,20 +115,37 @@ function main(): void {
     mainLoop();
 }
 
-function download(canvas: HTMLCanvasElement): void {
-    const name = "stereogram.png";
-
-    if ((canvas as any).msToBlob) { // for IE
-        const blob = (canvas as any).msToBlob();
-        (window.navigator as any).msSaveBlob(blob, name);
+/** Longest side = targetPx; preserves aspect ratio from layout (clientWidth / clientHeight). */
+function computeExportDimensions(canvas: HTMLCanvasElement, targetLongest: number): [number, number] {
+    const cw = canvas.clientWidth > 0 ? canvas.clientWidth : 1;
+    const ch = canvas.clientHeight > 0 ? canvas.clientHeight : 1;
+    const aspect = cw / ch;
+    let w: number;
+    let h: number;
+    if (cw >= ch) {
+        w = targetLongest;
+        h = Math.max(1, Math.round(targetLongest / aspect));
     } else {
-        canvas.toBlob((blob: Blob) => {
-            const link = document.createElement("a");
-            link.download = name;
-            link.href = URL.createObjectURL(blob);
-            link.click();
-        });
+        h = targetLongest;
+        w = Math.max(1, Math.round(targetLongest * aspect));
     }
+    return [w, h];
+}
+
+function clampExportToWebGLLimits(w: number, h: number): [number, number] {
+    const maxRb = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE) as number;
+    const maxTex = gl.getParameter(gl.MAX_TEXTURE_SIZE) as number;
+    const maxVp = gl.getParameter(gl.MAX_VIEWPORT_DIMS) as Int32Array;
+    const maxW = Math.min(maxRb, maxTex, maxVp[0]);
+    const maxH = Math.min(maxRb, maxTex, maxVp[1]);
+    if (w <= maxW && h <= maxH) {
+        return [w, h];
+    }
+    const scale = Math.min(maxW / w, maxH / h);
+    return [
+        Math.max(1, Math.floor(w * scale)),
+        Math.max(1, Math.floor(h * scale)),
+    ];
 }
 
 main();

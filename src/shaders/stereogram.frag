@@ -44,15 +44,18 @@ vec2 computeTileUv(vec2 position) {
     return position;
 }
 
-// Pan/zoom applied in texture space; clamp to the useful (cropped) area — offsets that push
-// outside that rect will stick at the edge (tile uses clamp-to-edge sampling).
+// Sample the tile so that pattern UV [0,1]^2 maps directly onto the crop rectangle of the
+// texture. The crop's aspect ratio drives the tile shape (set in CPU via uTileHeight); the
+// shader just samples within the crop. Pan/zoom act inside the crop and clamp-to-edge keeps
+// offsets from sampling outside the cropped area.
 vec4 sampleTile(vec2 coords) {
-    coords = mix(uTileCropMin, uTileCropMax, coords);
-    vec2 zoomed = uTileScaling * uTileZoom;
-    coords = 0.5 + (coords - 0.5) * zoomed;
+    vec2 cropCenter = 0.5 * (uTileCropMin + uTileCropMax);
+    vec2 cropSize = uTileCropMax - uTileCropMin;
+    vec2 zoomed = cropSize * uTileScaling * uTileZoom;
+    coords = cropCenter + (coords - 0.5) * zoomed;
     coords += uTileOffset;
     vec2 he = 0.5 * abs(zoomed);
-    coords = clamp(coords, vec2(0.5) - he, vec2(0.5) + he);
+    coords = clamp(coords, cropCenter - he, cropCenter + he);
     return texture2D(uTileTexture, coords);
 }
 

@@ -16,9 +16,7 @@ const data = {
         filepath: path.join(__dirname, "..", "README.md"),
         branchName: "main"
     },
-    additionalLinks: [
-        { href: "https://piellardj.github.io/stereogram-solver/", text: "See my Magic Eye solver here." },
-    ],
+    additionalLinks: [],
     styleFiles: [],
     scriptFiles: [
         "script/gl-matrix-2.5.1-min.js",
@@ -464,6 +462,27 @@ const data = {
                     checked: false,
                 },
                 {
+                    type: Demopage.supportedControls.Tabs,
+                    title: "Download size",
+                    id: "download-size-tabs-id",
+                    unique: true,
+                    options: [
+                        {
+                            value: "1024",
+                            label: "1024",
+                        },
+                        {
+                            value: "2048",
+                            label: "2048",
+                            checked: true,
+                        },
+                        {
+                            value: "4096",
+                            label: "4096",
+                        },
+                    ],
+                },
+                {
                     type: Demopage.supportedControls.FileDownload,
                     id: "image-download-id",
                     label: "Download image"
@@ -472,6 +491,47 @@ const data = {
         }
     ]
 };
+
+/**
+ * Demopage / webpage-templates hardcodes the header (home), intro copy, and "project links" in EJS.
+ * We strip those from the main demo page and add clear text attribution in the footer.
+ */
+const ORIGINAL_AUTHOR_ATTRIBUTION_HTML = `    <p class="page-attribution">Original project by <a href="https://github.com/piellardj" rel="noopener noreferrer">Jérémie Piellard</a> · <a href="https://piellardj.github.io" rel="noopener noreferrer">Website</a> · <a href="https://github.com/piellardj/stereogram-webgl" rel="noopener noreferrer">Source</a></p>
+`;
+
+const ORIGINAL_AUTHOR_ATTRIBUTION_CSS = `
+.page-attribution{margin-top:12px;font-size:14px;line-height:1.4;color:#5e5e5e;color:var(--var-color-block-actionitem,#5e5e5e)}.page-attribution a{color:inherit;text-decoration:underline}.page-attribution a:hover{color:#7e7e7e;color:var(--var-color-block-actionitem-hover,#7e7e7e)}
+`;
+
+function patchGeneratedHtml(filepath: string, options: { stripProjectLinks: boolean; stripHeaderAndIntro?: boolean }): void {
+    let html = fs.readFileSync(filepath, "utf8");
+    // `description` contains a nested `project-links` div; strip that first so intro removal can match cleanly.
+    if (options.stripProjectLinks) {
+        html = html.replace(/\s*<br>\s*\n\s*<div class="project-links">[\s\S]*?<\/div>/, "");
+    }
+    if (options.stripHeaderAndIntro) {
+        html = html.replace(/<header>[\s\S]*?<\/header>\s*/, "");
+        html = html.replace(
+            /<div class="intro">\s*<h1>[\s\S]*?<\/h1>\s*<div class="description">[\s\S]*?<\/div>\s*<\/div>\s*/,
+            "",
+        );
+    }
+    if (html.indexOf("page-attribution") === -1) {
+        html = html.replace("</footer>", `${ORIGINAL_AUTHOR_ATTRIBUTION_HTML}</footer>`);
+    }
+    fs.writeFileSync(filepath, html);
+}
+
+function appendAttributionCss(pageCssPath: string): void {
+    if (!fs.existsSync(pageCssPath)) {
+        return;
+    }
+    const existing = fs.readFileSync(pageCssPath, "utf8");
+    if (existing.indexOf("page-attribution") !== -1) {
+        return;
+    }
+    fs.appendFileSync(pageCssPath, ORIGINAL_AUTHOR_ATTRIBUTION_CSS);
+}
 
 const SRC_DIR = path.resolve(__dirname);
 const DEST_DIR = path.resolve(__dirname, "..", "docs");
@@ -488,3 +548,11 @@ const SCRIPT_DECLARATION_FILEPATH = path.join(SRC_DIR, "ts", "page-interface-gen
 fs.writeFileSync(SCRIPT_DECLARATION_FILEPATH, buildResult.pageScriptDeclaration);
 
 fse.copySync(path.join(SRC_DIR, "static"), DEST_DIR);
+
+patchGeneratedHtml(path.join(DEST_DIR, "index.html"), { stripProjectLinks: true, stripHeaderAndIntro: true });
+const readmeIndexPath = path.join(DEST_DIR, "readme", "index.html");
+if (fs.existsSync(readmeIndexPath)) {
+    patchGeneratedHtml(readmeIndexPath, { stripProjectLinks: false });
+}
+appendAttributionCss(path.join(DEST_DIR, "css", "page.css"));
+appendAttributionCss(path.join(DEST_DIR, "readme", "css", "page.css"));
