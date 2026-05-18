@@ -6,7 +6,6 @@ import { Parameters } from "./parameters";
 import { RenderToTextureWithDepth } from "./texture/render-to-texture-with-depth";
 import { asyncLoadShader } from "./utils";
 
-
 interface IScenePreset {
     modelName: string;
     cameraPosition: [number, number, number];
@@ -16,36 +15,36 @@ interface IScenePreset {
 }
 
 const presets: { [id: string]: IScenePreset } = {
-    "primitives": {
+    primitives: {
         modelName: "primitives.obj",
         cameraPosition: [-1.3, 0, -0.54],
         nearPlane: 0.6,
         farPlane: 2.2,
     },
-    "cube": {
+    cube: {
         modelName: "cube.obj",
         cameraPosition: [-2, 0, -1],
         nearPlane: 1.3,
         farPlane: 3,
     },
-    "monkey": {
+    monkey: {
         modelName: "monkey.obj",
         cameraPosition: [-1.3, 0, -0.5],
         nearPlane: 0.7,
         farPlane: 2,
     },
-    "bunny": {
+    bunny: {
         modelName: "bunny.obj",
         cameraPosition: [-1.7, 0, -0.8],
         nearPlane: 0.9,
         farPlane: 2.3,
     },
-    "atomium": {
+    atomium: {
         modelName: "atomium.obj",
         cameraPosition: [-2.5, 0, -0.6],
         nearPlane: 1.5,
         farPlane: 3.4,
-    }
+    },
 };
 
 declare const mat4: any;
@@ -85,7 +84,13 @@ class Scene {
             mat4.fromRotation(this.modelMatrix, 0.0005 * performance.now(), [0, 0, 1]);
             mat4.multiply(this.mvMatrix, this.viewMatrix, this.modelMatrix);
 
-            mat4.perspective(this.projectionMatrix, 45, width / height, modelPreset.nearPlane, modelPreset.farPlane);
+            mat4.perspective(
+                this.projectionMatrix,
+                45,
+                width / height,
+                modelPreset.nearPlane,
+                modelPreset.farPlane
+            );
             mat4.multiply(this.mvpMatrix, this.projectionMatrix, this.mvMatrix);
 
             this._depthMap.reserveSpace(width, height);
@@ -94,10 +99,11 @@ class Scene {
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // tslint:disable-line:no-bitwise
 
             if (typeof modelPreset.model === "undefined") {
-                modelPreset.model = null;
+                modelPreset.model = undefined;
                 const loadedModelId = Parameters.modelId;
                 asyncLoadObjModel(modelPreset.modelName, (model: ObjModel) => {
-                    if (loadedModelId === Parameters.modelId) { // this method is called asynchronously, so check that this is still the model we want
+                    if (loadedModelId === Parameters.modelId) {
+                        // this method is called asynchronously, so check that this is still the model we want
                         modelPreset.model = model;
                     }
                 });
@@ -120,7 +126,4 @@ class Scene {
     }
 }
 
-export {
-    Scene,
-};
-
+export { Scene };

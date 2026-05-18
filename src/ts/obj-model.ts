@@ -2,7 +2,6 @@ import { gl } from "./gl-utils/gl-canvas";
 import { VBO } from "./gl-utils/vbo";
 import * as Loader from "./loader";
 
-
 interface IPoint {
     x: number;
     y: number;
@@ -25,7 +24,8 @@ class ObjModel {
             const lineItems = line.split(/\s+/);
             const command = lineItems[0];
 
-            if (command === "v") { // declare vertex
+            if (command === "v") {
+                // declare vertex
                 if (lineItems.length >= 4) {
                     vertices.push({
                         x: parseFloat(lineItems[1]),
@@ -33,22 +33,27 @@ class ObjModel {
                         z: parseFloat(lineItems[3]),
                     });
                 } else {
-                    console.log(`Ignoring line ${i} because it does not have enough items: '${line}'.`);
+                    console.log(
+                        `Ignoring line ${i} because it does not have enough items: '${line}'.`
+                    );
                     continue;
                 }
-            } else if (command === "f") { // declare face
+            } else if (command === "f") {
+                // declare face
                 if (lineItems.length >= 4) {
                     // faces with more that 3 vertices are interpreted as TRIANGLE_FAN
                     for (let iV = 3; iV < lineItems.length; iV++) {
                         const indices: number[] = [
-                            +(lineItems[1].split("/")[0]),
-                            +(lineItems[iV - 1].split("/")[0]),
-                            +(lineItems[iV].split("/")[0]),
+                            +lineItems[1].split("/")[0],
+                            +lineItems[iV - 1].split("/")[0],
+                            +lineItems[iV].split("/")[0],
                         ];
 
                         for (const indice of indices) {
                             if (indice < 1 || indice > vertices.length) {
-                                console.log(`Ignoring line ${i} because vertex index ${indice} is out of range: '${line}'.`);
+                                console.log(
+                                    `Ignoring line ${i} because vertex index ${indice} is out of range: '${line}'.`
+                                );
                                 continue;
                             }
                         }
@@ -64,7 +69,9 @@ class ObjModel {
                         geometry.push(vertices[indices[2] - 1].z);
                     }
                 } else {
-                    console.log(`Ignoring line ${i} because only triangular faces are supported: '${line}'.`);
+                    console.log(
+                        `Ignoring line ${i} because only triangular faces are supported: '${line}'.`
+                    );
                     continue;
                 }
             } else {
@@ -102,7 +109,8 @@ function asyncLoadObjModel(name: string, callback: (model: ObjModel) => unknown)
             Loader.registerLoadedObject(id);
 
             if (request.status === 200) {
-                if (typeof modelsCache[name] === "undefined") { // maybe it was loaded in the meantime
+                if (typeof modelsCache[name] === "undefined") {
+                    // maybe it was loaded in the meantime
                     modelsCache[name] = ObjModel.parse(request.responseText);
                 }
             }
@@ -114,8 +122,4 @@ function asyncLoadObjModel(name: string, callback: (model: ObjModel) => unknown)
     }
 }
 
-export {
-    asyncLoadObjModel,
-    ObjModel,
-};
-
+export { asyncLoadObjModel, ObjModel };

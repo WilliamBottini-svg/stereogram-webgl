@@ -2,7 +2,6 @@ import * as Loader from "./loader";
 
 import "./page-interface-generated";
 
-
 /* === IDs ============================================================ */
 const controlId = {
     TILE_MODE_TABS: "tile-mode-tabs-id",
@@ -110,7 +109,7 @@ abstract class Parameters {
         return Page.Tabs.getValues(controlId.HEIGHTMAP_MODE_TABS)[0] as EHeightmapMode;
     }
     public static get modelId(): string {
-        return Page.Select.getValue(controlId.MODEL_PRESET_SELECT);
+        return Page.Select.getValue(controlId.MODEL_PRESET_SELECT) ?? "";
     }
     public static get depth(): number {
         return Page.Range.getValue(controlId.DEPTH_RANGE);
@@ -180,7 +179,10 @@ abstract class Parameters {
     }
 }
 
-function parseImageUpload(filesList: FileList, callback: (uploadedImage: HTMLImageElement) => unknown): void {
+function parseImageUpload(
+    filesList: FileList,
+    callback: (uploadedImage: HTMLImageElement) => unknown
+): void {
     if (filesList.length === 1) {
         const reader = new FileReader();
         reader.onload = () => {
@@ -208,7 +210,7 @@ function loadImage(url: string, callback: (loadedImage: HTMLImageElement) => unk
 }
 
 function updateControlsVisibility(): void {
-    const isTileNoiseMode = (Parameters.tileMode === ETileMode.NOISE);
+    const isTileNoiseMode = Parameters.tileMode === ETileMode.NOISE;
     Page.Controls.setVisibility(controlId.TILE_NOISE_RESOLUTION, isTileNoiseMode);
     Page.Controls.setVisibility(controlId.TILE_NOISE_COLORED, isTileNoiseMode);
     Page.Controls.setVisibility(controlId.TILE_NOISE_SQUARE, isTileNoiseMode);
@@ -219,12 +221,11 @@ function updateControlsVisibility(): void {
     Page.Controls.setVisibility(controlId.TILE_CROP_MIN_V, !isTileNoiseMode);
     Page.Controls.setVisibility(controlId.TILE_CROP_MAX_V, !isTileNoiseMode);
 
-    const isMovingMode = (Parameters.heightmapMode === EHeightmapMode.MOVING);
+    const isMovingMode = Parameters.heightmapMode === EHeightmapMode.MOVING;
     Page.Controls.setVisibility(controlId.HEIGHTMAP_PRESET_SELECT, !isMovingMode);
     Page.Controls.setVisibility(controlId.HEIGHTMAP_UPLOAD_BUTTON, !isMovingMode);
     Page.Controls.setVisibility(controlId.MODEL_PRESET_SELECT, isMovingMode);
 }
-
 
 Page.Canvas.Observers.canvasResize.push(callRedrawObservers);
 Page.Checkbox.addObserver(controlId.SHOW_HEIGHTMAP, callRedrawObservers);
@@ -242,7 +243,8 @@ Page.Tabs.addObserver(controlId.HEIGHTMAP_MODE_TABS, () => {
 {
     const onNewHeightmapTexture = (onlyIfPresetIs: string | null, image: HTMLImageElement) => {
         const preset = Page.Select.getValue(controlId.HEIGHTMAP_PRESET_SELECT);
-        if (preset === onlyIfPresetIs) { // this method is call asynchronously, so check that the current preset is still the same
+        if (preset === onlyIfPresetIs) {
+            // this method is call asynchronously, so check that the current preset is still the same
             for (const observer of Parameters.heightmapChangeObservers) {
                 observer(image);
             }
@@ -266,7 +268,6 @@ Page.Tabs.addObserver(controlId.HEIGHTMAP_MODE_TABS, () => {
     onHeightmapPresetChange();
 }
 
-
 Page.Checkbox.addObserver(controlId.SHOW_UV, callRedrawObservers);
 Page.Tabs.addObserver(controlId.TILE_MODE_TABS, () => {
     updateControlsVisibility();
@@ -282,7 +283,8 @@ Page.Tabs.addObserver(controlId.TILE_MODE_TABS, () => {
 
     const onNewTileTexture = (onlyIfPresetIs: string | null, image: HTMLImageElement) => {
         const preset = Page.Select.getValue(controlId.TILE_PRESET_SELECT);
-        if (preset === onlyIfPresetIs) { // this method is call asynchronously, so check that the current preset is still the same
+        if (preset === onlyIfPresetIs) {
+            // this method is call asynchronously, so check that the current preset is still the same
             for (const observer of Parameters.tileChangeObservers) {
                 observer(image);
             }
@@ -321,7 +323,6 @@ Page.Range.addObserver(controlId.TILE_CROP_MAX_U, callRedrawObservers);
 Page.Range.addObserver(controlId.TILE_CROP_MIN_V, callRedrawObservers);
 Page.Range.addObserver(controlId.TILE_CROP_MAX_V, callRedrawObservers);
 
-
 {
     const updateStripesControlsVisibility = () => {
         const isAdaptativeMode = Parameters.stripesMode === EStripesMode.ADAPTATIVE;
@@ -329,7 +330,7 @@ Page.Range.addObserver(controlId.TILE_CROP_MAX_V, callRedrawObservers);
         Page.Controls.setVisibility(controlId.STRIPES_WIDTH_RANGE, isAdaptativeMode);
         Page.Controls.setVisibility(
             controlId.STRIPES_MAIN_CUSTOM_RANGE,
-            Parameters.mainStripe === EMainStripe.CUSTOM,
+            Parameters.mainStripe === EMainStripe.CUSTOM
         );
     };
     const onStripesChange = () => {
@@ -344,25 +345,18 @@ Page.Range.addObserver(controlId.TILE_CROP_MAX_V, callRedrawObservers);
     updateStripesControlsVisibility();
 }
 
-
 Page.FileControl.addDownloadObserver(controlId.IMAGE_DOWNLOAD, () => {
     callObservers(Parameters.imageDownloadObservers);
 });
 
-
 function updateIndicatorsVisibility(): void {
-    Page.Canvas.setIndicatorsVisibility(Page.Checkbox.isChecked(controlId.SHOW_INDICATORS_CHECKBOX));
+    Page.Canvas.setIndicatorsVisibility(
+        Page.Checkbox.isChecked(controlId.SHOW_INDICATORS_CHECKBOX)
+    );
 }
 Page.Checkbox.addObserver(controlId.SHOW_INDICATORS_CHECKBOX, updateIndicatorsVisibility);
 updateIndicatorsVisibility();
 
 updateControlsVisibility();
 
-export {
-    EHeightmapMode,
-    EStripesMode,
-    EMainStripe,
-    ETileMode,
-    Parameters,
-};
-
+export { EHeightmapMode, EStripesMode, EMainStripe, ETileMode, Parameters };

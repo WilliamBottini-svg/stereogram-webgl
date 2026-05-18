@@ -5,8 +5,16 @@ function notImplemented(): void {
     alert("NOT IMPLEMENTED YET");
 }
 
-function bindUniformFloat(gl: WebGLRenderingContext, location: WebGLUniformLocation, value: number | number[]): void;
-function bindUniformFloat(gl: WebGLRenderingContext, location: WebGLUniformLocation, value: any): void {
+function bindUniformFloat(
+    gl: WebGLRenderingContext,
+    location: WebGLUniformLocation,
+    value: number | number[]
+): void;
+function bindUniformFloat(
+    gl: WebGLRenderingContext,
+    location: WebGLUniformLocation,
+    value: any
+): void {
     if (Array.isArray(value)) {
         gl.uniform1fv(location, value);
     } else {
@@ -14,20 +22,40 @@ function bindUniformFloat(gl: WebGLRenderingContext, location: WebGLUniformLocat
     }
 }
 
-function bindUniformFloat2v(gl: WebGLRenderingContext, location: WebGLUniformLocation, value: number[]): void {
+function bindUniformFloat2v(
+    gl: WebGLRenderingContext,
+    location: WebGLUniformLocation,
+    value: number[]
+): void {
     gl.uniform2fv(location, value);
 }
 
-function bindUniformFloat3v(gl: WebGLRenderingContext, location: WebGLUniformLocation, value: number[]): void {
+function bindUniformFloat3v(
+    gl: WebGLRenderingContext,
+    location: WebGLUniformLocation,
+    value: number[]
+): void {
     gl.uniform3fv(location, value);
 }
 
-function bindUniformFloat4v(gl: WebGLRenderingContext, location: WebGLUniformLocation, value: number[]): void {
+function bindUniformFloat4v(
+    gl: WebGLRenderingContext,
+    location: WebGLUniformLocation,
+    value: number[]
+): void {
     gl.uniform4fv(location, value);
 }
 
-function bindUniformInt(gl: WebGLRenderingContext, location: WebGLUniformLocation, value: number | number[]): void;
-function bindUniformInt(gl: WebGLRenderingContext, location: WebGLUniformLocation, value: any): void {
+function bindUniformInt(
+    gl: WebGLRenderingContext,
+    location: WebGLUniformLocation,
+    value: number | number[]
+): void;
+function bindUniformInt(
+    gl: WebGLRenderingContext,
+    location: WebGLUniformLocation,
+    value: any
+): void {
     if (Array.isArray(value)) {
         gl.uniform1iv(location, value);
     } else {
@@ -35,82 +63,130 @@ function bindUniformInt(gl: WebGLRenderingContext, location: WebGLUniformLocatio
     }
 }
 
-function bindUniformInt2v(gl: WebGLRenderingContext, location: WebGLUniformLocation, value: number[]): void {
+function bindUniformInt2v(
+    gl: WebGLRenderingContext,
+    location: WebGLUniformLocation,
+    value: number[]
+): void {
     gl.uniform2iv(location, value);
 }
 
-function bindUniformInt3v(gl: WebGLRenderingContext, location: WebGLUniformLocation, value: number[]): void {
+function bindUniformInt3v(
+    gl: WebGLRenderingContext,
+    location: WebGLUniformLocation,
+    value: number[]
+): void {
     gl.uniform3iv(location, value);
 }
 
-function bindUniformInt4v(gl: WebGLRenderingContext, location: WebGLUniformLocation, value: number[]): void {
+function bindUniformInt4v(
+    gl: WebGLRenderingContext,
+    location: WebGLUniformLocation,
+    value: number[]
+): void {
     gl.uniform4iv(location, value);
 }
 
-function bindUniformBool(gl: WebGLRenderingContext, location: WebGLUniformLocation, value: boolean | number): void {
+function bindUniformBool(
+    gl: WebGLRenderingContext,
+    location: WebGLUniformLocation,
+    value: boolean | number
+): void {
     gl.uniform1i(location, +value);
 }
 
-function bindUniformBool2v(gl: WebGLRenderingContext, location: WebGLUniformLocation, value: any): void {
+function bindUniformBool2v(
+    gl: WebGLRenderingContext,
+    location: WebGLUniformLocation,
+    value: any
+): void {
     gl.uniform2iv(location, value);
 }
 
-function bindUniformBool3v(gl: WebGLRenderingContext, location: WebGLUniformLocation, value: any): void {
+function bindUniformBool3v(
+    gl: WebGLRenderingContext,
+    location: WebGLUniformLocation,
+    value: any
+): void {
     gl.uniform3iv(location, value);
 }
 
-function bindUniformBool4v(gl: WebGLRenderingContext, location: WebGLUniformLocation, value: any): void {
+function bindUniformBool4v(
+    gl: WebGLRenderingContext,
+    location: WebGLUniformLocation,
+    value: any
+): void {
     gl.uniform4iv(location, value);
 }
 
-function bindUniformFloatMat2(gl: WebGLRenderingContext, location: WebGLUniformLocation, value: number[]): void {
+function bindUniformFloatMat2(
+    gl: WebGLRenderingContext,
+    location: WebGLUniformLocation,
+    value: number[]
+): void {
     gl.uniformMatrix2fv(location, false, value);
 }
 
-function bindUniformFloatMat3(gl: WebGLRenderingContext, location: WebGLUniformLocation, value: number[]): void {
+function bindUniformFloatMat3(
+    gl: WebGLRenderingContext,
+    location: WebGLUniformLocation,
+    value: number[]
+): void {
     gl.uniformMatrix3fv(location, false, value);
 }
 
-function bindUniformFloatMat4(gl: WebGLRenderingContext, location: WebGLUniformLocation, value: number[]): void {
+function bindUniformFloatMat4(
+    gl: WebGLRenderingContext,
+    location: WebGLUniformLocation,
+    value: number[]
+): void {
     gl.uniformMatrix4fv(location, false, value);
 }
 
-function bindSampler2D(gl: WebGLRenderingContext, location: WebGLUniformLocation, unitNb: number,
-    value: WebGLTexture): void {
+function bindSampler2D(
+    gl: WebGLRenderingContext,
+    location: WebGLUniformLocation,
+    unitNb: number,
+    value: WebGLTexture
+): void {
     gl.uniform1i(location, unitNb);
     gl.activeTexture((gl as any)["TEXTURE" + unitNb] as number);
     gl.bindTexture(gl.TEXTURE_2D, value);
 }
 
-function bindSamplerCube(gl: WebGLRenderingContext, location: WebGLUniformLocation, unitNb: number,
-    value: WebGLTexture): void {
+function bindSamplerCube(
+    gl: WebGLRenderingContext,
+    location: WebGLUniformLocation,
+    unitNb: number,
+    value: WebGLTexture
+): void {
     gl.uniform1i(location, unitNb);
     gl.activeTexture((gl as any)["TEXTURE" + unitNb] as number);
     gl.bindTexture(gl.TEXTURE_CUBE_MAP, value);
 }
 
 /* From WebGL spec:
-* http://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14 */
+ * http://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14 */
 interface IBindingType {
     str: string;
     binder: (...args: any[]) => unknown;
 }
 const types: { [index: string]: IBindingType } = {
-    0x8B50: { str: "FLOAT_VEC2", binder: bindUniformFloat2v },
-    0x8B51: { str: "FLOAT_VEC3", binder: bindUniformFloat3v },
-    0x8B52: { str: "FLOAT_VEC4", binder: bindUniformFloat4v },
-    0x8B53: { str: "INT_VEC2", binder: bindUniformInt2v },
-    0x8B54: { str: "INT_VEC3", binder: bindUniformInt3v },
-    0x8B55: { str: "INT_VEC4", binder: bindUniformInt4v },
-    0x8B56: { str: "BOOL", binder: bindUniformBool },
-    0x8B57: { str: "BOOL_VEC2", binder: bindUniformBool2v },
-    0x8B58: { str: "BOOL_VEC3", binder: bindUniformBool3v },
-    0x8B59: { str: "BOOL_VEC4", binder: bindUniformBool4v },
-    0x8B5A: { str: "FLOAT_MAT2", binder: bindUniformFloatMat2 },
-    0x8B5B: { str: "FLOAT_MAT3", binder: bindUniformFloatMat3 },
-    0x8B5C: { str: "FLOAT_MAT4", binder: bindUniformFloatMat4 },
-    0x8B5E: { str: "SAMPLER_2D", binder: bindSampler2D },
-    0x8B60: { str: "SAMPLER_CUBE", binder: bindSamplerCube },
+    0x8b50: { str: "FLOAT_VEC2", binder: bindUniformFloat2v },
+    0x8b51: { str: "FLOAT_VEC3", binder: bindUniformFloat3v },
+    0x8b52: { str: "FLOAT_VEC4", binder: bindUniformFloat4v },
+    0x8b53: { str: "INT_VEC2", binder: bindUniformInt2v },
+    0x8b54: { str: "INT_VEC3", binder: bindUniformInt3v },
+    0x8b55: { str: "INT_VEC4", binder: bindUniformInt4v },
+    0x8b56: { str: "BOOL", binder: bindUniformBool },
+    0x8b57: { str: "BOOL_VEC2", binder: bindUniformBool2v },
+    0x8b58: { str: "BOOL_VEC3", binder: bindUniformBool3v },
+    0x8b59: { str: "BOOL_VEC4", binder: bindUniformBool4v },
+    0x8b5a: { str: "FLOAT_MAT2", binder: bindUniformFloatMat2 },
+    0x8b5b: { str: "FLOAT_MAT3", binder: bindUniformFloatMat3 },
+    0x8b5c: { str: "FLOAT_MAT4", binder: bindUniformFloatMat4 },
+    0x8b5e: { str: "SAMPLER_2D", binder: bindSampler2D },
+    0x8b60: { str: "SAMPLER_CUBE", binder: bindSamplerCube },
     0x1400: { str: "BYTE", binder: notImplemented },
     0x1401: { str: "UNSIGNED_BYTE", binder: notImplemented },
     0x1402: { str: "SHORT", binder: notImplemented },
@@ -121,30 +197,33 @@ const types: { [index: string]: IBindingType } = {
 };
 
 interface IShaderUniform {
-    value: boolean | boolean[] | number | number[] | WebGLTexture | WebGLTexture[];
-    loc: WebGLUniformLocation;
+    value: boolean | boolean[] | number | number[] | WebGLTexture | WebGLTexture[] | null;
+    loc: WebGLUniformLocation | null;
     size: number;
     type: number;
 }
 
 interface IShaderAttribute {
-    VBO: VBO;
+    VBO: VBO | null;
     loc: GLint;
     size: number;
     type: number;
 }
 
 class ShaderProgram extends GLResource {
-    public u: { [name: string]: IShaderUniform };
-    public a: { [name: string]: IShaderAttribute };
+    public u!: { [name: string]: IShaderUniform };
+    public a!: { [name: string]: IShaderAttribute };
 
-    private id: WebGLProgram;
+    private id: WebGLProgram | null;
     private uCount: number;
     private aCount: number;
 
     constructor(gl: WebGLRenderingContext, vertexSource: string, fragmentSource: string) {
-        function createShader(type: GLenum, source: string): WebGLShader {
+        function createShader(type: GLenum, source: string): WebGLShader | null {
             const shader = gl.createShader(type);
+            if (!shader) {
+                return null;
+            }
             gl.shaderSource(shader, source);
             gl.compileShader(shader);
 
@@ -167,8 +246,14 @@ class ShaderProgram extends GLResource {
 
         const vertexShader = createShader(gl.VERTEX_SHADER, vertexSource);
         const fragmentShader = createShader(gl.FRAGMENT_SHADER, fragmentSource);
+        if (!vertexShader || !fragmentShader) {
+            return;
+        }
 
         const id = gl.createProgram();
+        if (!id) {
+            return;
+        }
         gl.attachShader(id, vertexShader);
         gl.attachShader(id, fragmentShader);
         gl.linkProgram(id);
@@ -200,7 +285,7 @@ class ShaderProgram extends GLResource {
         Object.keys(this.u).forEach((uName: string) => {
             const uniform = this.u[uName];
             if (uniform.value !== null) {
-                if (uniform.type === 0x8B5E || uniform.type === 0x8B60) {
+                if (uniform.type === 0x8b5e || uniform.type === 0x8b60) {
                     const unitNb: number = currTextureUnitNb;
                     types[uniform.type].binder(gl, uniform.loc, unitNb, uniform.value);
                     currTextureUnitNb++;
@@ -228,29 +313,35 @@ class ShaderProgram extends GLResource {
     private introspection(): void {
         const gl = super.gl();
 
-        this.uCount = gl.getProgramParameter(this.id, gl.ACTIVE_UNIFORMS);
+        this.uCount = gl.getProgramParameter(this.id!, gl.ACTIVE_UNIFORMS);
         this.u = {};
         for (let i = 0; i < this.uCount; i++) {
-            const uniform = gl.getActiveUniform(this.id, i);
+            const uniform = gl.getActiveUniform(this.id!, i);
+            if (!uniform) {
+                continue;
+            }
             const name = uniform.name;
 
             this.u[name] = {
-                loc: gl.getUniformLocation(this.id, name),
+                loc: gl.getUniformLocation(this.id!, name),
                 size: uniform.size,
                 type: uniform.type,
                 value: null,
             };
         }
 
-        this.aCount = gl.getProgramParameter(this.id, gl.ACTIVE_ATTRIBUTES);
+        this.aCount = gl.getProgramParameter(this.id!, gl.ACTIVE_ATTRIBUTES);
         this.a = {};
         for (let i = 0; i < this.aCount; i++) {
-            const attribute = gl.getActiveAttrib(this.id, i);
+            const attribute = gl.getActiveAttrib(this.id!, i);
+            if (!attribute) {
+                continue;
+            }
             const name = attribute.name;
 
             this.a[name] = {
                 VBO: null,
-                loc: gl.getAttribLocation(this.id, name),
+                loc: gl.getAttribLocation(this.id!, name),
                 size: attribute.size,
                 type: attribute.type,
             };

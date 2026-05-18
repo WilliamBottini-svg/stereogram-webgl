@@ -4,7 +4,4 @@ interface ITexture {
     height: number;
 }
 
-export {
-    ITexture,
-};
-
+export { ITexture };

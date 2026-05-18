@@ -1,0 +1,7 @@
+node_modules
+docs
+src/static/script/gl-matrix-2.5.1-min.js
+src/ts/page-interface-generated.ts
+package-lock.json
+*.min.js
+*.min.js.map

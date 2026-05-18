@@ -3,7 +3,6 @@ import { gl } from "../gl-utils/gl-canvas";
 import { createImageData } from "../utils";
 import { ITexture } from "./i-texture";
 
-
 const defaultImageData = createImageData(1, 1, new Uint8ClampedArray([0, 0, 0, 0]));
 
 class ImageTexture implements ITexture {
@@ -13,7 +12,7 @@ class ImageTexture implements ITexture {
     private _height: number = -1;
 
     public constructor() {
-        this.id = gl.createTexture();
+        this.id = gl.createTexture()!;
 
         this.uploadToGPU(defaultImageData);
     }
@@ -39,7 +38,4 @@ class ImageTexture implements ITexture {
     }
 }
 
-export {
-    ImageTexture,
-};
-
+export { ImageTexture };

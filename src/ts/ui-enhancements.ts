@@ -185,7 +185,7 @@ function enhanceRangeControls(): void {
     const controlElements = Array.prototype.slice.call(controls) as HTMLElement[];
     for (const control of controlElements) {
         const rangeContainer = control.querySelector(".range-container");
-        const rangeInput = control.querySelector("input[type=\"range\"]") as HTMLInputElement | null;
+        const rangeInput = control.querySelector('input[type="range"]') as HTMLInputElement | null;
         if (!rangeContainer || !rangeInput || !rangeInput.id) {
             continue;
         }
@@ -254,16 +254,20 @@ function enhanceRangeControls(): void {
 }
 
 function slugifySectionTitle(title: string): string {
-    return title
-        .trim()
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "") || "section";
+    return (
+        title
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-|-$/g, "") || "section"
+    );
 }
 
 function readSectionCollapsed(title: string): boolean {
     try {
-        return window.localStorage.getItem(SECTION_STORAGE_PREFIX + slugifySectionTitle(title)) === "1";
+        return (
+            window.localStorage.getItem(SECTION_STORAGE_PREFIX + slugifySectionTitle(title)) === "1"
+        );
     } catch {
         return false;
     }
@@ -271,7 +275,10 @@ function readSectionCollapsed(title: string): boolean {
 
 function writeSectionCollapsed(title: string, collapsed: boolean): void {
     try {
-        window.localStorage.setItem(SECTION_STORAGE_PREFIX + slugifySectionTitle(title), collapsed ? "1" : "0");
+        window.localStorage.setItem(
+            SECTION_STORAGE_PREFIX + slugifySectionTitle(title),
+            collapsed ? "1" : "0"
+        );
     } catch {
         /* ignore */
     }
