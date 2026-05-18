@@ -24,11 +24,31 @@ This project is a fork of [piellardj/stereogram-webgl](https://github.com/piella
 
 **Planned in this branch** (in progress):
 
-- Shareable URL state: every parameter encoded in the URL hash so any configuration is a copy-pasteable link
-- Modern tooling pass: tslint → ESLint + Prettier, GitHub Actions CI, Vitest test suite, modern TS target
 - Hand-written UI replacing the generated control panel: design-system CSS variables, dark mode, container-query-based responsive layout, a11y pass
 
-See `CHANGES.md` (coming) for a running log.
+## Shareable URL state
+
+Every numeric, boolean, and enum parameter is encoded into the URL hash, so any configuration is a copy-pasteable link. Click the **Copy link** button in the top-right corner to grab one.
+
+Design notes (the things I'd talk about in an interview):
+
+- Compact `key=value&key=value` format in the hash (`#d=0.5&sc=12&tm=texture&...`) rather than base64-of-JSON. Human-readable, diffable, and unknown keys are silently ignored on decode so older links keep working as the schema grows.
+- Short keys (e.g. `d` for depth, `cu0`/`cu1` for tile-crop min/max U) keep URLs paste-friendly.
+- Floats are quantized to 4 decimal places before encoding — well below slider precision and roughly halves URL length.
+- Writes use `history.replaceState` and are debounced 250 ms, so dragging a slider doesn't spam browser history.
+- File-backed parameters (uploaded depth maps, uploaded pattern textures) are intentionally excluded — a URL hash is far too small to embed an image. Preset names are encoded; uploads aren't.
+
+The codec lives in [`src/ts/url-state.ts`](src/ts/url-state.ts) (pure functions, fully unit-tested) and the UI binding lives in [`src/ts/url-state-binding.ts`](src/ts/url-state-binding.ts).
+
+## Modern tooling
+
+This fork adds the engineering infrastructure that wasn't in the original:
+
+- **ESLint flat config + Prettier** (the original used `tslint`, deprecated since 2019).
+- **Strict TypeScript**: `strict` + `strictNullChecks` on, ES2020 target.
+- **GitHub Actions CI** runs lint, format-check, typecheck, tests, and the webpack bundle on every push.
+- **Vitest test suite** for the pure logic (export-dimension math, URL state codec) — see `src/ts/**/*.test.ts`.
+- **Husky pre-commit hook** runs lint + typecheck + tests locally before each commit.
 
 ---
 

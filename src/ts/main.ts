@@ -7,6 +7,7 @@ import { EHeightmapMode, ETileMode, Parameters } from "./parameters";
 import { Tile } from "./tile";
 import { initBrowserFullscreenPreview } from "./fullscreen-preview";
 import { computeExportDimensions, clampExportToLimits } from "./export-dimensions";
+import { initUrlStateSync, installCopyLinkButton } from "./url-state-binding";
 
 import "./page-interface-generated";
 import "./ui-enhancements";
@@ -33,11 +34,14 @@ function main(): void {
     }
     const canvas: HTMLCanvasElement = maybeCanvas;
 
+    initUrlStateSync();
+
     const engine = new Engine();
     const heightmap = new Heightmap();
     const tile = new Tile();
 
     initBrowserFullscreenPreview();
+    installCopyLinkButton();
 
     let nbFramesSinceLastUpdate = 0;
     setInterval(() => {
