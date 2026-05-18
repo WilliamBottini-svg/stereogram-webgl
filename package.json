@@ -1,8 +1,12 @@
 {
-  "name": "stereogram-webgl",
-  "homepage": "https://piellardj.github.io/stereogram-webgl",
-  "author": "Jérémie PIELLARD <jeremie.piellard@gmail.com> (https://github.com/piellardj)",
-  "repository": "github:piellardj/stereogram-webgl",
+  "name": "stereogram-webgl-extended",
+  "description": "WebGL autostereogram generator. Fork of piellardj/stereogram-webgl extended with pattern placement, cropping, fullscreen preview, shareable URL state, and a redesigned UI.",
+  "homepage": "https://williambottini-svg.github.io/stereogram-webgl",
+  "author": "William Bottini <william.bottini@gmail.com> (https://github.com/williambottini-svg)",
+  "contributors": [
+    "Jérémie Piellard <jeremie.piellard@gmail.com> (https://github.com/piellardj) — original project"
+  ],
+  "repository": "github:williambottini-svg/stereogram-webgl",
   "private": true,
   "scripts": {
     "pre-commit": "npm run rebuild && npm run lint",

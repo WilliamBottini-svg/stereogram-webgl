@@ -2,3 +2,13 @@ node_modules
 *generated.*
 !src/ts/page-interface-generated.ts
 debug.log
+
+# OS junk
+.DS_Store
+*.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
