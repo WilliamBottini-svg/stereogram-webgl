@@ -1,10 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-    decodeState,
-    encodeState,
-    SUPPORTED_FIELDS,
-    type StereogramUrlState,
-} from "./url-state";
+import { decodeState, encodeState, SUPPORTED_FIELDS, type StereogramUrlState } from "./url-state";
 
 describe("encodeState", () => {
     it("returns an empty string for an empty state", () => {
@@ -45,7 +40,11 @@ describe("encodeState", () => {
     });
 
     it("ignores undefined and null values", () => {
-        const state = { depth: 0.5, stripesCount: undefined, tileMode: null as unknown as undefined };
+        const state = {
+            depth: 0.5,
+            stripesCount: undefined,
+            tileMode: null as unknown as undefined,
+        };
         expect(encodeState(state)).toBe("d=0.5");
     });
 

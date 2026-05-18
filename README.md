@@ -22,9 +22,19 @@ This project is a fork of [piellardj/stereogram-webgl](https://github.com/piella
 | Download-size selector (1024 / 2048 / 4096) and UI/attribution refactor | [`b727a86`](../../commit/b727a86) |
 | Service worker to handle stale registrations | [`3151aaf`](../../commit/3151aaf) |
 
-**Planned in this branch** (in progress):
+## Redesigned UI
 
-- Hand-written UI replacing the generated control panel: design-system CSS variables, dark mode, container-query-based responsive layout, a11y pass
+The original project ships with a generic control-panel theme. This fork replaces it with a custom design system that fully restyles the app:
+
+- **CSS custom-property palette** (light and dark) — theming is just a token swap on `[data-theme="dark"]`, no per-component dark-mode rules. See [`src/static/css/custom.css`](src/static/css/custom.css).
+- **Dark / light mode toggle** with `prefers-color-scheme` as the default, explicit choice persisted to `localStorage`. A small inline script in `<head>` applies the theme before first paint so there's no light-to-dark flash on dark-preferred systems.
+- **CSS Grid app shell**: canvas + control panel layout that adapts to viewport width.
+- **Container queries on the control panel** so it reflows based on its own width (works the same whether docked, floated, or in a narrow sheet).
+- **Mobile bottom-sheet**: under 900 px wide the control panel becomes a draggable sheet that slides up from the bottom of the screen.
+- **A11y baked in**: visible `:focus-visible` rings, sufficient WCAG-AA contrast, ARIA labels on the floating buttons, `prefers-reduced-motion` honored.
+- **Frosted-glass canvas buttons** with `backdrop-filter` blur, sized for touch targets (36 px) but compact.
+
+The new design lives entirely in `src/static/css/custom.css` (loaded after the framework's `page.css` and overrides most of it) and `src/ts/theme.ts` (theme toggle module). The HTML structure is preserved so the existing observers and framework runtime keep working.
 
 ## Shareable URL state
 

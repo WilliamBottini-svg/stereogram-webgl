@@ -8,9 +8,13 @@ import { Tile } from "./tile";
 import { initBrowserFullscreenPreview } from "./fullscreen-preview";
 import { computeExportDimensions, clampExportToLimits } from "./export-dimensions";
 import { initUrlStateSync, installCopyLinkButton } from "./url-state-binding";
+import { initTheme, installThemeToggle } from "./theme";
 
 import "./page-interface-generated";
 import "./ui-enhancements";
+
+// Run before anything else so the chosen theme is in place before first paint.
+initTheme();
 
 function main(): void {
     const webglFlags = {
@@ -42,6 +46,7 @@ function main(): void {
 
     initBrowserFullscreenPreview();
     installCopyLinkButton();
+    installThemeToggle();
 
     let nbFramesSinceLastUpdate = 0;
     setInterval(() => {

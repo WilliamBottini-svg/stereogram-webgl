@@ -204,17 +204,8 @@ export function installCopyLinkButton(): void {
     button.id = "copy-link-button";
     button.type = "button";
     button.title = "Copy a shareable link to the current configuration";
+    button.setAttribute("aria-label", "Copy shareable link");
     button.textContent = "Copy link";
-    button.style.cssText = [
-        "margin-top:8px",
-        "padding:6px 10px",
-        "border:1px solid rgba(255,255,255,0.4)",
-        "background:rgba(0,0,0,0.55)",
-        "color:#fff",
-        "font:13px system-ui,-apple-system,sans-serif",
-        "border-radius:4px",
-        "cursor:pointer",
-    ].join(";");
 
     button.addEventListener("click", () => {
         const url = window.location.href;
@@ -250,20 +241,14 @@ function showToast(message: string): void {
     }
     const toast = document.createElement("div");
     toast.id = "url-state-toast";
+    toast.setAttribute("role", "status");
+    toast.setAttribute("aria-live", "polite");
     toast.textContent = message;
-    toast.style.cssText = [
-        "position:fixed",
-        "bottom:24px",
-        "left:50%",
-        "transform:translateX(-50%)",
-        "padding:8px 16px",
-        "background:rgba(0,0,0,0.85)",
-        "color:#fff",
-        "font:13px system-ui,-apple-system,sans-serif",
-        "border-radius:4px",
-        "z-index:9999",
-        "pointer-events:none",
-    ].join(";");
+    // Position/size come from custom.css; keep a minimal fallback inline so the
+    // toast is still positioned reasonably if the stylesheet fails to load.
+    toast.style.cssText =
+        "position:fixed;bottom:24px;left:50%;transform:translateX(-50%);" +
+        "padding:8px 16px;z-index:9999;pointer-events:none";
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), TOAST_VISIBLE_MS);
 }
