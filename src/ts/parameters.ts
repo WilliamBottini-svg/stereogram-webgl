@@ -1,44 +1,7 @@
 import * as Loader from "./loader";
+import { controlId, MAIN_STRIPE_RANGE_SCALE } from "./control-ids";
 
 import "./page-interface-generated";
-
-/* === IDs ============================================================ */
-const controlId = {
-    TILE_MODE_TABS: "tile-mode-tabs-id",
-    TILE_PRESET_SELECT: "tile-preset-select-id",
-    TILE_NOISE_RESOLUTION: "tile-noise-resolution-range-id",
-    TILE_NOISE_SQUARE: "tile-noise-square-checkbox-id",
-    TILE_NOISE_COLORED: "tile-noise-colored-checkbox-id",
-    SHOW_UV: "show-uv-checkbox-id",
-    TILE_UPLOAD_BUTTON: "input-tile-upload-button",
-    TILE_PATTERN_OFFSET_X: "tile-pattern-offset-x-range-id",
-    TILE_PATTERN_OFFSET_Y: "tile-pattern-offset-y-range-id",
-    TILE_PATTERN_ZOOM: "tile-pattern-zoom-range-id",
-    TILE_PATTERN_REPEAT_X: "tile-pattern-repeat-x-range-id",
-    TILE_PATTERN_REPEAT_Y: "tile-pattern-repeat-y-range-id",
-    TILE_CROP_MIN_U: "tile-crop-min-u-range-id",
-    TILE_CROP_MAX_U: "tile-crop-max-u-range-id",
-    TILE_CROP_MIN_V: "tile-crop-min-v-range-id",
-    TILE_CROP_MAX_V: "tile-crop-max-v-range-id",
-
-    HEIGHTMAP_MODE_TABS: "heightmap-mode-tabs-id",
-    HEIGHTMAP_PRESET_SELECT: "heightmap-preset-select-id",
-    MODEL_PRESET_SELECT: "model-preset-select-id",
-    DEPTH_RANGE: "depth-range-id",
-    HEIGHTMAP_INVERT_CHECKBOX: "invert-heightmap-checkbox-id",
-    SHOW_HEIGHTMAP: "show-heightmap-checkbox-id",
-    HEIGHTMAP_UPLOAD_BUTTON: "input-heightmap-upload-button",
-
-    STRIPES_MAIN_TABS: "main-stripe-tabs-id",
-    STRIPES_MAIN_CUSTOM_RANGE: "main-stripe-custom-range-id",
-    STRIPES_MODE_TABS: "stripes-mode-tabs-id",
-    STRIPES_WIDTH_RANGE: "stripes-width-range-id",
-    STRIPES_COUNT_RANGE: "stripes-count-range-id",
-
-    SHOW_INDICATORS_CHECKBOX: "show-indicators-checkbox-id",
-    DOWNLOAD_SIZE_TABS: "download-size-tabs-id",
-    IMAGE_DOWNLOAD: "image-download-id",
-};
 
 type Observer = () => unknown;
 type ImageUploadObserver = (image: HTMLImageElement) => unknown;
@@ -136,7 +99,7 @@ abstract class Parameters {
 
     /** 0..1 normalized position along stripe columns; used when main stripe is Custom */
     public static get mainStripeNormalized(): number {
-        return Page.Range.getValue(controlId.STRIPES_MAIN_CUSTOM_RANGE) / 1000;
+        return Page.Range.getValue(controlId.STRIPES_MAIN_CUSTOM_RANGE) / MAIN_STRIPE_RANGE_SCALE;
     }
 
     public static get tilePatternOffsetX(): number {

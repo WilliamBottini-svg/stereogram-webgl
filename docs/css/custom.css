@@ -285,11 +285,9 @@ a:focus-visible {
 #fullscreen-toggle-id,
 #side-pane-toggle-id {
     background-image: url("../images/resize.svg");
-    background-position: 0 0;
-    background-size: 200%;
     background-repeat: no-repeat;
     background-origin: padding-box;
-    /* The framework uses 32x32 SVGs. Center them in the larger 36px button. */
+    /* Framework SVGs are 32x32; center them inside the larger 36px button. */
     background-position: center;
     background-size: 60% 60%;
 }
@@ -751,10 +749,11 @@ footer a {
 }
 
 /* ============================================================
- * Toast (matches inline styles in url-state-binding.ts)
+ * Toast (the positioning fallback is set inline in ui/toast.ts;
+ * these rules override it with the themed look once loaded).
  * ============================================================ */
 
-#url-state-toast {
+#app-toast {
     background: var(--c-surface) !important;
     color: var(--c-text) !important;
     border: 1px solid var(--c-border);

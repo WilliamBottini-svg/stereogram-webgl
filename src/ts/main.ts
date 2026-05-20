@@ -7,13 +7,16 @@ import { EHeightmapMode, ETileMode, Parameters } from "./parameters";
 import { Tile } from "./tile";
 import { initBrowserFullscreenPreview } from "./fullscreen-preview";
 import { computeExportDimensions, clampExportToLimits } from "./export-dimensions";
-import { initUrlStateSync, installCopyLinkButton } from "./url-state-binding";
+import { initUrlStateSync } from "./url-state-binding";
+import { installCopyLinkButton } from "./ui/copy-link-button";
 import { initTheme, installThemeToggle } from "./theme";
 
 import "./page-interface-generated";
 import "./ui-enhancements";
 
-// Run before anything else so the chosen theme is in place before first paint.
+// Wire up the theme system. The no-flash <head> script already applied the
+// theme before first paint; this re-asserts it defensively and hooks up live
+// reactions to OS theme changes.
 initTheme();
 
 function main(): void {

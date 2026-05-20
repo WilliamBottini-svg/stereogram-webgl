@@ -102,8 +102,13 @@ export function installThemeToggle(): void {
 }
 
 /**
- * Initialize the theme as early as possible. Safe to call before DOM is fully
- * parsed — it only touches <html> and a meta tag if present.
+ * Wire up the theme system from the main bundle.
+ *
+ * The no-flash `<head>` script in index.html is what actually applies the theme
+ * before first paint. By the time this runs the theme is already set; the
+ * `applyTheme` call here is a defensive re-assert for the case where that inline
+ * script failed (e.g. threw before completing). Its real job is registering the
+ * live `prefers-color-scheme` listener, which the inline script does not do.
  */
 export function initTheme(): void {
     applyTheme(getActiveTheme());

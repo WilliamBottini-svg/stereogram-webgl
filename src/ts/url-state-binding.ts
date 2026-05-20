@@ -4,12 +4,12 @@
  * - At boot, parses `window.location.hash` and applies decoded values to the
  *   relevant Page controls before the first render.
  * - On every parameter change (via `Parameters.redrawObservers`), rebuilds the
- *   hash from the current UI state with a 250 ms debounce so dragging a slider
- *   doesn't spam the history.
- * - Updates the URL via `history.replaceState` so the back button is not affected.
- * - Injects a small "Copy link" button into the canvas controls column with a
- *   transient toast confirmation. This is a placeholder UI for Phase 3; the
- *   redesigned UI in Phase 4 will replace it with a properly styled control.
+ *   hash from the current UI state with a debounce so dragging a slider doesn't
+ *   spam the history.
+ * - Updates the URL via `history.replaceState` so the back button is unaffected.
+ *
+ * UI widgets (the Copy-link button, the toast) live in `ui/`. This module is
+ * only concerned with the state <-> URL mapping.
  */
 
 import {
@@ -23,47 +23,22 @@ import {
     encodeState,
 } from "./url-state";
 import { Parameters } from "./parameters";
-
-import "./page-interface-generated";
+import { controlId, MAIN_STRIPE_RANGE_SCALE } from "./control-ids";
+import {
+    getSelectSafe,
+    setCheckboxSafe,
+    setRangeSafe,
+    setSelectSafe,
+    setTabsSafe,
+} from "./page-controls";
 
 const DEBOUNCE_MS = 250;
-const TOAST_VISIBLE_MS = 1800;
 
-// Control IDs — duplicated from parameters.ts so this module is self-contained.
-// If parameters.ts ever exports its IDs, this list should be replaced with that
-// import. Today they're a private const.
-const CONTROL_IDS = {
-    TILE_MODE_TABS: "tile-mode-tabs-id",
-    TILE_PRESET_SELECT: "tile-preset-select-id",
-    TILE_NOISE_RESOLUTION: "tile-noise-resolution-range-id",
-    TILE_NOISE_SQUARE: "tile-noise-square-checkbox-id",
-    TILE_NOISE_COLORED: "tile-noise-colored-checkbox-id",
-    SHOW_UV: "show-uv-checkbox-id",
-    TILE_PATTERN_OFFSET_X: "tile-pattern-offset-x-range-id",
-    TILE_PATTERN_OFFSET_Y: "tile-pattern-offset-y-range-id",
-    TILE_PATTERN_ZOOM: "tile-pattern-zoom-range-id",
-    TILE_PATTERN_REPEAT_X: "tile-pattern-repeat-x-range-id",
-    TILE_PATTERN_REPEAT_Y: "tile-pattern-repeat-y-range-id",
-    TILE_CROP_MIN_U: "tile-crop-min-u-range-id",
-    TILE_CROP_MAX_U: "tile-crop-max-u-range-id",
-    TILE_CROP_MIN_V: "tile-crop-min-v-range-id",
-    TILE_CROP_MAX_V: "tile-crop-max-v-range-id",
-
-    HEIGHTMAP_MODE_TABS: "heightmap-mode-tabs-id",
-    HEIGHTMAP_PRESET_SELECT: "heightmap-preset-select-id",
-    MODEL_PRESET_SELECT: "model-preset-select-id",
-    DEPTH_RANGE: "depth-range-id",
-    HEIGHTMAP_INVERT_CHECKBOX: "invert-heightmap-checkbox-id",
-    SHOW_HEIGHTMAP: "show-heightmap-checkbox-id",
-
-    STRIPES_MAIN_TABS: "main-stripe-tabs-id",
-    STRIPES_MAIN_CUSTOM_RANGE: "main-stripe-custom-range-id",
-    STRIPES_MODE_TABS: "stripes-mode-tabs-id",
-    STRIPES_WIDTH_RANGE: "stripes-width-range-id",
-    STRIPES_COUNT_RANGE: "stripes-count-range-id",
-
-    DOWNLOAD_SIZE_TABS: "download-size-tabs-id",
-} as const;
+/**
+ * Window after boot during which crop values from the URL are re-asserted on
+ * every tile-texture load. See `reassertCropAfterTileLoads` for the rationale.
+ */
+const CROP_REASSERT_WINDOW_MS = 5000;
 
 /** Read every encodable parameter out of the live UI. */
 export function readStateFromUi(): StereogramUrlState {
@@ -97,73 +72,141 @@ export function readStateFromUi(): StereogramUrlState {
         tileCropMaxV: Parameters.tileCropMaxV,
 
         downloadSize: Parameters.downloadSize as DownloadSize,
-        heightmapPreset: getSelectSafe(CONTROL_IDS.HEIGHTMAP_PRESET_SELECT),
-        tilePreset: getSelectSafe(CONTROL_IDS.TILE_PRESET_SELECT),
-        modelId: Parameters.modelId,
+        // All three presets are read the same way: straight off their <select>.
+        heightmapPreset: getSelectSafe(controlId.HEIGHTMAP_PRESET_SELECT),
+        tilePreset: getSelectSafe(controlId.TILE_PRESET_SELECT),
+        modelId: getSelectSafe(controlId.MODEL_PRESET_SELECT),
     };
+}
+
+/** The four tile-crop slider IDs paired with their value in a given state. */
+function cropTargets(state: StereogramUrlState): Array<[string, number | undefined]> {
+    return [
+        [controlId.TILE_CROP_MIN_U, state.tileCropMinU],
+        [controlId.TILE_CROP_MAX_U, state.tileCropMaxU],
+        [controlId.TILE_CROP_MIN_V, state.tileCropMinV],
+        [controlId.TILE_CROP_MAX_V, state.tileCropMaxV],
+    ];
 }
 
 /** Apply a (possibly partial) URL state back to the live UI controls. */
 export function applyStateToUi(state: StereogramUrlState): void {
-    if (state.tileMode !== undefined) setTabsSafe(CONTROL_IDS.TILE_MODE_TABS, [state.tileMode]);
-    if (state.heightmapMode !== undefined)
-        setTabsSafe(CONTROL_IDS.HEIGHTMAP_MODE_TABS, [state.heightmapMode]);
-    if (state.mainStripe !== undefined)
-        setTabsSafe(CONTROL_IDS.STRIPES_MAIN_TABS, [state.mainStripe]);
-    if (state.stripesMode !== undefined)
-        setTabsSafe(CONTROL_IDS.STRIPES_MODE_TABS, [state.stripesMode]);
-
-    setRangeSafe(CONTROL_IDS.DEPTH_RANGE, state.depth);
-    setRangeSafe(CONTROL_IDS.STRIPES_COUNT_RANGE, state.stripesCount);
-    setRangeSafe(CONTROL_IDS.STRIPES_WIDTH_RANGE, state.stripesWidth);
-    setRangeSafe(
-        CONTROL_IDS.STRIPES_MAIN_CUSTOM_RANGE,
-        // Parameters.mainStripeNormalized is the range value / 1000; reverse here.
-        state.mainStripeNormalized !== undefined ? state.mainStripeNormalized * 1000 : undefined
-    );
-    setRangeSafe(CONTROL_IDS.TILE_NOISE_RESOLUTION, state.noiseTileResolution);
-
-    setCheckboxSafe(CONTROL_IDS.TILE_NOISE_SQUARE, state.noiseTileSquare);
-    setCheckboxSafe(CONTROL_IDS.TILE_NOISE_COLORED, state.noiseTileColored);
-    setCheckboxSafe(CONTROL_IDS.HEIGHTMAP_INVERT_CHECKBOX, state.invertHeightmap);
-    setCheckboxSafe(CONTROL_IDS.SHOW_HEIGHTMAP, state.showHeightmap);
-    setCheckboxSafe(CONTROL_IDS.SHOW_UV, state.showUV);
-
-    setRangeSafe(CONTROL_IDS.TILE_PATTERN_OFFSET_X, state.tilePatternOffsetX);
-    setRangeSafe(CONTROL_IDS.TILE_PATTERN_OFFSET_Y, state.tilePatternOffsetY);
-    setRangeSafe(CONTROL_IDS.TILE_PATTERN_ZOOM, state.tilePatternZoom);
-    setRangeSafe(CONTROL_IDS.TILE_PATTERN_REPEAT_X, state.tilePatternRepeatX);
-    setRangeSafe(CONTROL_IDS.TILE_PATTERN_REPEAT_Y, state.tilePatternRepeatY);
-
-    setRangeSafe(CONTROL_IDS.TILE_CROP_MIN_U, state.tileCropMinU);
-    setRangeSafe(CONTROL_IDS.TILE_CROP_MAX_U, state.tileCropMaxU);
-    setRangeSafe(CONTROL_IDS.TILE_CROP_MIN_V, state.tileCropMinV);
-    setRangeSafe(CONTROL_IDS.TILE_CROP_MAX_V, state.tileCropMaxV);
-
-    if (state.downloadSize !== undefined)
-        setTabsSafe(CONTROL_IDS.DOWNLOAD_SIZE_TABS, [String(state.downloadSize)]);
-    if (state.heightmapPreset !== undefined)
-        setSelectSafe(CONTROL_IDS.HEIGHTMAP_PRESET_SELECT, state.heightmapPreset);
-    if (state.tilePreset !== undefined)
-        setSelectSafe(CONTROL_IDS.TILE_PRESET_SELECT, state.tilePreset);
-    if (state.modelId !== undefined) setSelectSafe(CONTROL_IDS.MODEL_PRESET_SELECT, state.modelId);
-}
-
-/** Set up the boot-time hash read and the change-driven hash write. */
-export function initUrlStateSync(): void {
-    // Boot: apply hash to UI before the first render observers fire.
-    if (typeof window !== "undefined" && window.location.hash) {
-        try {
-            applyStateToUi(decodeState(window.location.hash));
-        } catch (e) {
-            // Decoder is supposed to be exception-free; if a Page setter throws on
-            // a missing control, swallow it so a malformed link never bricks the app.
-            console.warn("Failed to apply URL state:", e);
-        }
+    if (state.tileMode !== undefined) {
+        setTabsSafe(controlId.TILE_MODE_TABS, [state.tileMode]);
+    }
+    if (state.heightmapMode !== undefined) {
+        setTabsSafe(controlId.HEIGHTMAP_MODE_TABS, [state.heightmapMode]);
+    }
+    if (state.mainStripe !== undefined) {
+        setTabsSafe(controlId.STRIPES_MAIN_TABS, [state.mainStripe]);
+    }
+    if (state.stripesMode !== undefined) {
+        setTabsSafe(controlId.STRIPES_MODE_TABS, [state.stripesMode]);
     }
 
-    // Live: debounced write of the current state to the URL on every change.
+    setRangeSafe(controlId.DEPTH_RANGE, state.depth);
+    setRangeSafe(controlId.STRIPES_COUNT_RANGE, state.stripesCount);
+    setRangeSafe(controlId.STRIPES_WIDTH_RANGE, state.stripesWidth);
+    setRangeSafe(
+        controlId.STRIPES_MAIN_CUSTOM_RANGE,
+        state.mainStripeNormalized !== undefined
+            ? state.mainStripeNormalized * MAIN_STRIPE_RANGE_SCALE
+            : undefined
+    );
+    setRangeSafe(controlId.TILE_NOISE_RESOLUTION, state.noiseTileResolution);
+
+    setCheckboxSafe(controlId.TILE_NOISE_SQUARE, state.noiseTileSquare);
+    setCheckboxSafe(controlId.TILE_NOISE_COLORED, state.noiseTileColored);
+    setCheckboxSafe(controlId.HEIGHTMAP_INVERT_CHECKBOX, state.invertHeightmap);
+    setCheckboxSafe(controlId.SHOW_HEIGHTMAP, state.showHeightmap);
+    setCheckboxSafe(controlId.SHOW_UV, state.showUV);
+
+    setRangeSafe(controlId.TILE_PATTERN_OFFSET_X, state.tilePatternOffsetX);
+    setRangeSafe(controlId.TILE_PATTERN_OFFSET_Y, state.tilePatternOffsetY);
+    setRangeSafe(controlId.TILE_PATTERN_ZOOM, state.tilePatternZoom);
+    setRangeSafe(controlId.TILE_PATTERN_REPEAT_X, state.tilePatternRepeatX);
+    setRangeSafe(controlId.TILE_PATTERN_REPEAT_Y, state.tilePatternRepeatY);
+
+    for (const [id, value] of cropTargets(state)) {
+        setRangeSafe(id, value);
+    }
+
+    if (state.downloadSize !== undefined) {
+        setTabsSafe(controlId.DOWNLOAD_SIZE_TABS, [String(state.downloadSize)]);
+    }
+    if (state.heightmapPreset !== undefined) {
+        setSelectSafe(controlId.HEIGHTMAP_PRESET_SELECT, state.heightmapPreset);
+    }
+    if (state.tilePreset !== undefined) {
+        setSelectSafe(controlId.TILE_PRESET_SELECT, state.tilePreset);
+    }
+    if (state.modelId !== undefined) {
+        setSelectSafe(controlId.MODEL_PRESET_SELECT, state.modelId);
+    }
+}
+
+/**
+ * `parameters.ts` resets the four tile-crop sliders to 0/1 every time a tile
+ * texture finishes loading (`onNewTileTexture -> resetTileCrop`). At boot a deep
+ * link triggers one or two such loads (the default preset, then the
+ * URL-specified preset) which complete in network order — so crop values set
+ * synchronously by `applyStateToUi` get wiped by a load that lands afterwards.
+ *
+ * Fix: for a short settling window after boot, re-assert the URL's crop values
+ * once each tile load completes. The reset runs synchronously right after the
+ * tile-change observers, so we defer past it with a macrotask. After the window
+ * the observer removes itself and the normal "changing preset resets crop"
+ * behaviour resumes.
+ */
+function reassertCropAfterTileLoads(state: StereogramUrlState): void {
+    const targets = cropTargets(state);
+    if (targets.every(([, value]) => value === undefined)) {
+        return;
+    }
+
+    const windowEnd = Date.now() + CROP_REASSERT_WINDOW_MS;
+    const observer = (): void => {
+        if (Date.now() > windowEnd) {
+            // Remove ourselves outside the observer iteration to avoid
+            // disturbing the loop in parameters.ts.
+            setTimeout(() => {
+                const i = Parameters.tileChangeObservers.indexOf(observer);
+                if (i >= 0) {
+                    Parameters.tileChangeObservers.splice(i, 1);
+                }
+            }, 0);
+            return;
+        }
+        // resetTileCrop() runs synchronously after this observer; defer past it.
+        setTimeout(() => {
+            for (const [id, value] of targets) {
+                setRangeSafe(id, value);
+            }
+        }, 0);
+    };
+    Parameters.tileChangeObservers.push(observer);
+}
+
+/** Apply the URL hash to the UI. Safe to call once at boot. */
+export function applyUrlStateAtBoot(): void {
+    if (typeof window === "undefined" || !window.location.hash) {
+        return;
+    }
+    try {
+        const decoded = decodeState(window.location.hash);
+        applyStateToUi(decoded);
+        reassertCropAfterTileLoads(decoded);
+    } catch (e) {
+        // decodeState never throws; a Page setter might if a control is missing.
+        // Swallow so a malformed link can never brick the app.
+        console.warn("Failed to apply URL state at boot:", e);
+    }
+}
+
+/** Start mirroring live parameter changes into the URL hash (debounced). */
+export function startUrlStateSync(): void {
     let timer: ReturnType<typeof setTimeout> | null = null;
+
     const scheduleUrlUpdate = (): void => {
         if (timer !== null) {
             clearTimeout(timer);
@@ -174,7 +217,7 @@ export function initUrlStateSync(): void {
                 const encoded = encodeState(readStateFromUi());
                 const newHash = encoded ? `#${encoded}` : "";
                 if (window.location.hash !== newHash) {
-                    // Use replaceState so slider drags don't pollute browser history.
+                    // replaceState so slider drags don't pollute browser history.
                     const url = window.location.pathname + window.location.search + newHash;
                     history.replaceState(null, "", url);
                 }
@@ -187,112 +230,8 @@ export function initUrlStateSync(): void {
     Parameters.redrawObservers.push(scheduleUrlUpdate);
 }
 
-/** Inject a Copy-link button into the canvas controls column with a small toast. */
-export function installCopyLinkButton(): void {
-    if (typeof document === "undefined") {
-        return;
-    }
-    const column = document.getElementById("canvas-buttons-column");
-    if (!column) {
-        return;
-    }
-    if (document.getElementById("copy-link-button")) {
-        return;
-    }
-
-    const button = document.createElement("button");
-    button.id = "copy-link-button";
-    button.type = "button";
-    button.title = "Copy a shareable link to the current configuration";
-    button.setAttribute("aria-label", "Copy shareable link");
-    button.textContent = "Copy link";
-
-    button.addEventListener("click", () => {
-        const url = window.location.href;
-        const copy = (): Promise<void> | void => {
-            if (navigator.clipboard?.writeText) {
-                return navigator.clipboard.writeText(url);
-            }
-            // Fallback for environments without async clipboard.
-            const ta = document.createElement("textarea");
-            ta.value = url;
-            ta.style.position = "fixed";
-            ta.style.opacity = "0";
-            document.body.appendChild(ta);
-            ta.select();
-            document.execCommand("copy");
-            document.body.removeChild(ta);
-        };
-        Promise.resolve(copy())
-            .then(() => showToast("Link copied"))
-            .catch(() => showToast("Copy failed"));
-    });
-
-    column.appendChild(button);
-}
-
-function showToast(message: string): void {
-    if (typeof document === "undefined") {
-        return;
-    }
-    const existing = document.getElementById("url-state-toast");
-    if (existing) {
-        existing.remove();
-    }
-    const toast = document.createElement("div");
-    toast.id = "url-state-toast";
-    toast.setAttribute("role", "status");
-    toast.setAttribute("aria-live", "polite");
-    toast.textContent = message;
-    // Position/size come from custom.css; keep a minimal fallback inline so the
-    // toast is still positioned reasonably if the stylesheet fails to load.
-    toast.style.cssText =
-        "position:fixed;bottom:24px;left:50%;transform:translateX(-50%);" +
-        "padding:8px 16px;z-index:9999;pointer-events:none";
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), TOAST_VISIBLE_MS);
-}
-
-// === Page setter wrappers that swallow errors on missing controls ============
-
-function setRangeSafe(id: string, value: number | undefined): void {
-    if (value === undefined) return;
-    try {
-        Page.Range.setValue(id, value);
-    } catch {
-        // ignore missing control
-    }
-}
-
-function setCheckboxSafe(id: string, value: boolean | undefined): void {
-    if (value === undefined) return;
-    try {
-        Page.Checkbox.setChecked(id, value);
-    } catch {
-        // ignore missing control
-    }
-}
-
-function setTabsSafe(id: string, values: string[]): void {
-    try {
-        Page.Tabs.setValues(id, values);
-    } catch {
-        // ignore missing control
-    }
-}
-
-function setSelectSafe(id: string, value: string): void {
-    try {
-        Page.Select.setValue(id, value);
-    } catch {
-        // ignore missing control
-    }
-}
-
-function getSelectSafe(id: string): string | undefined {
-    try {
-        return Page.Select.getValue(id) ?? undefined;
-    } catch {
-        return undefined;
-    }
+/** Convenience: apply the boot hash and start the live sync in one call. */
+export function initUrlStateSync(): void {
+    applyUrlStateAtBoot();
+    startUrlStateSync();
 }
