@@ -57,7 +57,7 @@ This fork adds the engineering infrastructure that wasn't in the original:
 - **ESLint flat config + Prettier** (the original used `tslint`, deprecated since 2019).
 - **Strict TypeScript**: `strict` + `strictNullChecks` on, ES2020 target.
 - **GitHub Actions CI** runs lint, format-check, typecheck, tests, and the webpack bundle on every push.
-- **Vitest test suite** for the pure logic (export-dimension math, URL state codec) — see `src/ts/**/*.test.ts`.
+- **Vitest test suite** (70 tests) covering the pure logic — export-dimension math, the URL state codec — and the URL binding layer, where the `Page` framework and `Parameters` singleton are substituted with recording fakes so no browser is needed. See `src/ts/**/*.test.ts`.
 - **Husky pre-commit hook** runs lint + typecheck + tests locally before each commit.
 
 ---

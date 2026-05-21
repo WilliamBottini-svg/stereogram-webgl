@@ -157,8 +157,11 @@ export function applyStateToUi(state: StereogramUrlState): void {
  * tile-change observers, so we defer past it with a macrotask. After the window
  * the observer removes itself and the normal "changing preset resets crop"
  * behaviour resumes.
+ *
+ * Exported for unit testing; in normal use it is called only by
+ * `applyUrlStateAtBoot`.
  */
-function reassertCropAfterTileLoads(state: StereogramUrlState): void {
+export function reassertCropAfterTileLoads(state: StereogramUrlState): void {
     const targets = cropTargets(state);
     if (targets.every(([, value]) => value === undefined)) {
         return;
