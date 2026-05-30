@@ -1,11 +1,48 @@
-# stereogram-webgl
-An autostereogram (also known as Magic Eye) is a 2D image designed to create the illusion of 3D. In each image, there is a 3D object that can only be viewed by looking at the image a certain way, as if the screen was transparent and you looked at the wall behind it. It gets easier with practice.
+# Stereogram-WebGL — real-time Magic Eye generator
 
-Autostereograms were very popular in the '90s. They take advantage of stereopsis: the brain tries to reconstruct depth by combining the two slightly different images perceived by each eye.
+A browser-based **autostereogram ("Magic Eye") generator** that runs entirely on the GPU with WebGL. Give it a depth map and a tile pattern, and it builds a flat image with a hidden 3D scene inside — in real time, even for moving scenes.
 
-In this project, you can use your own depth map, customize the tiles as well as the way the image is computed. It all runs on GPU and can also handle live moving scenes in real time.
+This is my extended version of an open-source tool originally created by [Jérémie Piellard](https://github.com/piellardj). I reworked parts of the interface and added several features on top — see [What I added](#what-i-added) and [Credits](#credits).
 
-See it live [here](https://piellardj.github.io/stereogram-webgl/).
+**▶ [Try it live](https://williambottini-svg.github.io/stereogram-webgl/)**  ·  [How it works](#how-does-it-work)
+
+<!-- Wave 3: replace this comment with a short looping demo GIF of the tool in action. -->
+
+## What I added
+
+Building on the original WebGL engine, my contributions include:
+
+- **Fullscreen preview** — a distraction-free viewing mode (square or fill-screen) with cross-browser Fullscreen API handling, so the hidden 3D scene is easier to actually see.
+- **Pattern placement & crop controls** — offset, zoom, repeat-scale, and crop the tile pattern live.
+- **Refined controls** — direct numeric entry and a reset button on every slider, plus collapsible control sections that remember their state between visits.
+- **PWA / offline support** — a service worker so the tool can be installed and used offline.
+- **High-DPI export** — render and download at 1024 / 2048 / 4096 px regardless of screen pixel density.
+- **In-page attribution** — the live page credits the original author in its footer.
+
+I did **not** write the core autostereogram algorithm — that is the original author's work, explained in [How does it work](#how-does-it-work).
+
+## Features
+
+- Runs entirely on the GPU (WebGL); handles live, moving scenes in real time
+- Use your own depth map and tile pattern, or pick from built-in presets
+- Noise or texture tile modes
+- Adjustable depth, stripe count / width, and central-stripe mode
+- Export to PNG at up to 4096 px
+
+## Built with
+
+- **TypeScript** and **WebGL** (GLSL shaders)
+- A declarative control-panel framework (`webpage-templates`)
+- webpack build pipeline
+- Hosted on GitHub Pages
+
+## Preview
+
+![Planet](src/readme/preview_planet.jpg)
+
+![Ship](src/readme/preview_ship.jpg)
+
+![Ripple](src/readme/preview_ripple.jpg)
 
 ## Run locally
 
@@ -25,19 +62,10 @@ See it live [here](https://piellardj.github.io/stereogram-webgl/).
 
 To rebuild after you change source files, run `npm run build` again (or use `npm run webpack:watch` in another terminal while `http-server` stays running).
 
-See my Magic Eye solver [here](https://piellardj.github.io/stereogram-solver/).
-
-[![Donate](https://raw.githubusercontent.com/piellardj/piellardj.github.io/master/images/readme/donate-paypal.svg)](https://www.paypal.com/donate/?hosted_button_id=AF7H7GEJTL95E)
-
-## Preview
-
-![Planet](src/readme/preview_planet.jpg)
-
-![Ship](src/readme/preview_ship.jpg)
-
-![Ripple](src/readme/preview_ripple.jpg)
-
 ## How to see a stereogram image
+
+> The instructions and practice images in this section are from the original project by [Jérémie Piellard](https://github.com/piellardj).
+
 ### Instructions
 Seeing the 3D scene hidden in a stereogram image takes a bit of practice. The key is to look beyond the image, and not focus the image itself. There are several techniques to do it:
 - if you are able to, just consciously relax your eyes like if you were looking in the distance
@@ -71,6 +99,9 @@ Below are images you can practice on while training. For each of them, you need 
 </div>
 
 ## How does it work
+
+> The explanation and diagrams in this section are from the original project by [Jérémie Piellard](https://github.com/piellardj).
+
 ### Base idea
 
 The brain perceives depth by combining the two slightly different images coming from our eyes. If an object looks exactly the same from both eyes, it means the object is far in the distance. On the contrary, if an object looks very different from each eye, it means the eyes each have a different perspective on it, so the object must be very close.
@@ -153,3 +184,13 @@ In the end, every pixel on the image is a displaced version of the source stripe
         <i>By displaying the UV coordinates the tile will be sampled at, the displacement is more visible. One can clearly see the sphere-shaped displacement sampled from the depth map.</i>
     </p>
 </div>
+
+## Credits
+
+This project is a fork and extension of **[stereogram-webgl](https://github.com/piellardj/stereogram-webgl)** by **[Jérémie Piellard](https://github.com/piellardj)** ([website](https://piellardj.github.io)), used under the MIT License. The core WebGL autostereogram engine, the explanatory text in *How to see a stereogram image* and *How does it work*, and all the practice images, diagrams, and preview renders above are his original work.
+
+If you'd like to support the original author, his donation link is on the [original repository](https://github.com/piellardj/stereogram-webgl). He also built a [Magic Eye solver](https://piellardj.github.io/stereogram-solver/).
+
+## License
+
+Released under the MIT License — see [LICENSE](LICENSE). Original work © 2021 Jérémie Piellard; modifications © 2026 William Bottini.

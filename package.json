@@ -1,8 +1,11 @@
 {
   "name": "stereogram-webgl",
-  "homepage": "https://piellardj.github.io/stereogram-webgl",
-  "author": "Jérémie PIELLARD <jeremie.piellard@gmail.com> (https://github.com/piellardj)",
-  "repository": "github:piellardj/stereogram-webgl",
+  "homepage": "https://williambottini-svg.github.io/stereogram-webgl",
+  "author": "William Bottini (https://github.com/WilliamBottini-svg)",
+  "contributors": [
+    "Jérémie Piellard <jeremie.piellard@gmail.com> (https://github.com/piellardj) — original author"
+  ],
+  "repository": "github:WilliamBottini-svg/stereogram-webgl",
   "private": true,
   "scripts": {
     "pre-commit": "npm run rebuild && npm run lint",
