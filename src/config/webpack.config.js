@@ -8,11 +8,11 @@ module.exports = {
     entry: path.join(PROJECT_DIR, "src", "ts", "main.ts"),
     output: {
         path: path.join(PROJECT_DIR, "docs", "script"),
-        filename: "[name].min.js"
+        filename: "[name].min.js",
     },
-    target: ["web", "es5"],
+    target: ["web", "es2020"],
     resolve: {
-        extensions: [".ts"]
+        extensions: [".ts", ".js"],
     },
     module: {
         rules: [
@@ -25,13 +25,13 @@ module.exports = {
                         options: {
                             //   transpileOnly: true,
                             compilerOptions: {
-                                rootDir: path.join(PROJECT_DIR, "src", "ts")
+                                rootDir: path.join(PROJECT_DIR, "src", "ts"),
                             },
-                            configFile: path.join(PROJECT_DIR, "src", "config", 'tsconfig.json')
-                        }
-                    }
+                            configFile: path.join(PROJECT_DIR, "src", "config", "tsconfig.json"),
+                        },
+                    },
                 ],
-            }
-        ]
-    }
-}
+            },
+        ],
+    },
+};

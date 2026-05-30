@@ -2,7 +2,6 @@ import { ETileMode, Parameters } from "./parameters";
 import { ImageTexture } from "./texture/image-texture";
 import { createImageData } from "./utils";
 
-
 interface ITileTexture {
     texture: ImageTexture;
     padding: number;
@@ -46,8 +45,8 @@ class Tile {
         const data = new Uint8ClampedArray(width * height * 4);
 
         function computePaddingTexel(x: number, y: number): void {
-            const originalX = (((x - 1) + usefulWidth) % usefulWidth) + 1;
-            const originalY = (((y - 1) + usefulHeight) % usefulHeight) + 1;
+            const originalX = ((x - 1 + usefulWidth) % usefulWidth) + 1;
+            const originalY = ((y - 1 + usefulHeight) % usefulHeight) + 1;
             const targetTexelStart = 4 * (x + width * y);
             const originalTexelStart = 4 * (originalX + width * originalY);
             for (let i = 0; i < 4; i++) {
@@ -83,7 +82,4 @@ class Tile {
     }
 }
 
-export {
-    Tile,
-};
-
+export { Tile };

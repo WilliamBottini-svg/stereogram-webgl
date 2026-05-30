@@ -9,7 +9,6 @@ import * as StereogramShader from "./stereogram-shader";
 import { Tile } from "./tile";
 import { asyncLoadShader, clamp } from "./utils";
 
-
 class Engine {
     private static readonly MIN_STRIPES_COUNT: number = 8;
     private static readonly MAX_STRIPES_COUNT: number = 24;
@@ -59,7 +58,7 @@ class Engine {
         const usefulStripesProportion = this.stripesCount / (this.stripesCount + 1);
         let heightmapHScaling = 1;
 
-        let shader: Shader;
+        let shader: Shader | null;
         if (Parameters.showHeightmap) {
             shader = this.heightmapShader;
             heightmapHScaling = usefulStripesProportion;
@@ -72,10 +71,18 @@ class Engine {
 
                 const isTextureMode = Parameters.tileMode === ETileMode.TEXTURE;
                 const eps = 1e-3;
-                const cropMinU = isTextureMode ? Math.min(Parameters.tileCropMinU, Parameters.tileCropMaxU - eps) : 0;
-                const cropMaxU = isTextureMode ? Math.max(Parameters.tileCropMaxU, Parameters.tileCropMinU + eps) : 1;
-                const cropMinV = isTextureMode ? Math.min(Parameters.tileCropMinV, Parameters.tileCropMaxV - eps) : 0;
-                const cropMaxV = isTextureMode ? Math.max(Parameters.tileCropMaxV, Parameters.tileCropMinV + eps) : 1;
+                const cropMinU = isTextureMode
+                    ? Math.min(Parameters.tileCropMinU, Parameters.tileCropMaxU - eps)
+                    : 0;
+                const cropMaxU = isTextureMode
+                    ? Math.max(Parameters.tileCropMaxU, Parameters.tileCropMinU + eps)
+                    : 1;
+                const cropMinV = isTextureMode
+                    ? Math.min(Parameters.tileCropMinV, Parameters.tileCropMaxV - eps)
+                    : 0;
+                const cropMaxV = isTextureMode
+                    ? Math.max(Parameters.tileCropMaxV, Parameters.tileCropMinV + eps)
+                    : 1;
                 const cropFracW = cropMaxU - cropMinU;
                 const cropFracH = cropMaxV - cropMinV;
 
@@ -86,16 +93,27 @@ class Engine {
                 const effectiveTileHeight = tileUsefulHeight * cropFracH;
 
                 const tileWidthInPixel = this.canvasWidth / (this.stripesCount + 1);
-                const tileHeightInPixel = tileWidthInPixel / (effectiveTileWidth / effectiveTileHeight);
+                const tileHeightInPixel =
+                    tileWidthInPixel / (effectiveTileWidth / effectiveTileHeight);
                 const tileHeight = tileHeightInPixel / this.canvasHeight;
 
                 shader.u["uTileTexture"].value = currentTile.texture.id;
-                shader.u["uTileColor"].value = (Parameters.tileMode === ETileMode.NOISE && !Parameters.noiseTileColored) ? 0 : 1;
+                shader.u["uTileColor"].value =
+                    Parameters.tileMode === ETileMode.NOISE && !Parameters.noiseTileColored ? 0 : 1;
                 shader.u["uTileHeight"].value = tileHeight;
-                shader.u["uTileScaling"].value = [tileUsefulWidth / currentTile.texture.width, -tileUsefulHeight / currentTile.texture.height];
-                shader.u["uTileOffset"].value = [Parameters.tilePatternOffsetX, Parameters.tilePatternOffsetY];
+                shader.u["uTileScaling"].value = [
+                    tileUsefulWidth / currentTile.texture.width,
+                    -tileUsefulHeight / currentTile.texture.height,
+                ];
+                shader.u["uTileOffset"].value = [
+                    Parameters.tilePatternOffsetX,
+                    Parameters.tilePatternOffsetY,
+                ];
                 shader.u["uTileZoom"].value = Parameters.tilePatternZoom;
-                shader.u["uTileRepeatScale"].value = [Parameters.tilePatternRepeatX, Parameters.tilePatternRepeatY];
+                shader.u["uTileRepeatScale"].value = [
+                    Parameters.tilePatternRepeatX,
+                    Parameters.tilePatternRepeatY,
+                ];
                 shader.u["uTileCropMin"].value = [cropMinU, cropMinV];
                 shader.u["uTileCropMax"].value = [cropMaxU, cropMaxV];
                 shader.u["uShowUV"].value = Parameters.showUV ? 1 : 0;
@@ -114,12 +132,19 @@ class Engine {
             shader.u["uInvertHeightmap"].value = Parameters.invertHeightmap;
             shader.u["uDepthFactor"].value = Parameters.depth;
 
-            const canvasAspectRatio = this.canvasWidth / this.canvasHeight * usefulStripesProportion;
+            const canvasAspectRatio =
+                (this.canvasWidth / this.canvasHeight) * usefulStripesProportion;
             const heightmapAspectRatio = heightmapTexture.width / heightmapTexture.height;
             if (canvasAspectRatio > heightmapAspectRatio) {
-                shader.u["uHeightmapScaling"].value = [canvasAspectRatio / heightmapAspectRatio / heightmapHScaling, -1];
+                shader.u["uHeightmapScaling"].value = [
+                    canvasAspectRatio / heightmapAspectRatio / heightmapHScaling,
+                    -1,
+                ];
             } else {
-                shader.u["uHeightmapScaling"].value = [1 / heightmapHScaling, -heightmapAspectRatio / canvasAspectRatio];
+                shader.u["uHeightmapScaling"].value = [
+                    1 / heightmapHScaling,
+                    -heightmapAspectRatio / canvasAspectRatio,
+                ];
             }
 
             shader.use();
@@ -160,7 +185,4 @@ class Engine {
     }
 }
 
-export {
-    Engine
-};
-
+export { Engine };

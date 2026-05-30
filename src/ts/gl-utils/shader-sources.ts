@@ -1,7 +1,7 @@
 type LoadCallback = (success: boolean) => void;
 
 interface ICachedSource {
-    text: string;
+    text: string | null;
     pending: boolean;
     failed: boolean;
     callbacks: LoadCallback[];
@@ -70,10 +70,7 @@ function loadSource(filename: string, callback: LoadCallback): void {
 }
 
 function getSource(filename: string): string {
-    return cachedSources[filename].text;
+    return cachedSources[filename].text ?? "";
 }
 
-export {
-    getSource,
-    loadSource,
-};
+export { getSource, loadSource };

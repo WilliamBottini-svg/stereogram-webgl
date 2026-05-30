@@ -32,7 +32,7 @@ function buildShader(infos: IShaderInfos, callback: BuildCallback): void {
 
     function loadedSource(success: boolean): void {
         function processSource(source: string): string {
-            return source.replace(/#INJECT\(([^)]*)\)/mg, (match: string, name: string) => {
+            return source.replace(/#INJECT\(([^)]*)\)/gm, (match: string, name: string) => {
                 if (infos.injected[name]) {
                     return infos.injected[name];
                 }
@@ -104,17 +104,12 @@ function registerShader(name: string, infos: IShaderInfos, callback: RegisterCal
 
 function deleteShader(name: string): void {
     if (typeof cachedShaders[name] !== "undefined") {
-        if (cachedShaders[name].shader !== null) {
-            cachedShaders[name].shader.freeGLResources();
+        const shader = cachedShaders[name].shader;
+        if (shader !== null) {
+            shader.freeGLResources();
         }
         delete cachedShaders[name];
     }
 }
 
-export {
-    buildShader,
-    getShader,
-    IShaderInfos,
-    registerShader,
-    deleteShader,
-};
+export { buildShader, getShader, IShaderInfos, registerShader, deleteShader };

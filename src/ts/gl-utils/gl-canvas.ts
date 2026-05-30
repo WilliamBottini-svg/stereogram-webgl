@@ -1,6 +1,6 @@
 import "../page-interface-generated";
 
-let gl: WebGLRenderingContext = null;
+let gl!: WebGLRenderingContext;
 
 /** Initializes a WebGL context */
 function initGL(flags?: object): boolean {
@@ -9,11 +9,15 @@ function initGL(flags?: object): boolean {
     }
 
     const canvas = Page.Canvas.getCanvas();
+    if (!canvas) {
+        setError("Canvas element not found.");
+        return false;
+    }
 
     gl = canvas.getContext("webgl", flags) as WebGLRenderingContext;
-    if (gl == null) {
+    if (gl === null) {
         gl = canvas.getContext("experimental-webgl", flags) as WebGLRenderingContext;
-        if (gl == null) {
+        if (gl === null) {
             setError("Your browser or device does not seem to support WebGL.");
             return false;
         }
@@ -32,7 +36,7 @@ The simulation may not run as expected.`);
 
 /* Adjusts the GL canvas size to the actual canvas element size on the page */
 function adjustSize(hidpi: boolean = false): void {
-    const cssPixel: number = (hidpi) ? window.devicePixelRatio : 1;
+    const cssPixel: number = hidpi ? window.devicePixelRatio : 1;
 
     const canvas = gl.canvas as HTMLCanvasElement;
 
@@ -44,8 +48,4 @@ function adjustSize(hidpi: boolean = false): void {
     }
 }
 
-export {
-    adjustSize,
-    initGL,
-    gl,
-};
+export { adjustSize, initGL, gl };

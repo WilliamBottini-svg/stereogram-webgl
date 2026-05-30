@@ -5,7 +5,6 @@ import { Scene } from "./scene";
 import { ITexture } from "./texture/i-texture";
 import { ImageTexture } from "./texture/image-texture";
 
-
 class Heightmap {
     private readonly heightmapTexture: ImageTexture;
 
@@ -31,7 +30,4 @@ class Heightmap {
     }
 }
 
-export {
-    Heightmap,
-};
-
+export { Heightmap };

@@ -1,8 +1,8 @@
-import GLResource from "./gl-resource";
-import Viewport from "./viewport";
+import { GLResource } from "./gl-resource";
+import { Viewport } from "./viewport";
 
 class FBO extends GLResource {
-    public static bindDefault(gl: WebGLRenderingContext, viewport: Viewport = null): void {
+    public static bindDefault(gl: WebGLRenderingContext, viewport: Viewport | null = null): void {
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
         if (viewport === null) {
@@ -10,12 +10,11 @@ class FBO extends GLResource {
         } else {
             gl.viewport(viewport.left, viewport.lower, viewport.width, viewport.height);
         }
-
     }
 
     public width: number;
     public height: number;
-    private id: WebGLFramebuffer;
+    private id: WebGLFramebuffer | null;
 
     constructor(gl: WebGLRenderingContext, width: number, height: number) {
         super(gl);
@@ -25,21 +24,30 @@ class FBO extends GLResource {
         this.height = height;
     }
 
-    public bind(colorBuffers: WebGLTexture[], depthBuffer: WebGLRenderbuffer = null): void {
+    public bind(colorBuffers: WebGLTexture[], depthBuffer: WebGLRenderbuffer | null = null): void {
         const gl = super.gl();
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.id);
         gl.viewport(0, 0, this.width, this.height);
 
         for (let i = 0; i < colorBuffers.length; ++i) {
-          gl.framebufferTexture2D(
-            gl.FRAMEBUFFER, gl["COLOR_ATTACHMENT" + i], gl.TEXTURE_2D, colorBuffers[i], 0);
+            gl.framebufferTexture2D(
+                gl.FRAMEBUFFER,
+                (gl as unknown as Record<string, number>)["COLOR_ATTACHMENT" + i],
+                gl.TEXTURE_2D,
+                colorBuffers[i],
+                0
+            );
         }
 
         if (depthBuffer) {
-          gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer);
-          gl.framebufferRenderbuffer(
-            gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, depthBuffer);
+            gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer);
+            gl.framebufferRenderbuffer(
+                gl.FRAMEBUFFER,
+                gl.DEPTH_ATTACHMENT,
+                gl.RENDERBUFFER,
+                depthBuffer
+            );
         }
     }
 
@@ -49,4 +57,5 @@ class FBO extends GLResource {
     }
 }
 
+export { FBO };
 export default FBO;

@@ -210,7 +210,7 @@ function enterBrowserFullscreenPreview(): void {
         () => {
             restoreCanvasFromOverlay();
             setPreviewCheckbox(false);
-        },
+        }
     );
 }
 
@@ -260,6 +260,4 @@ function initBrowserFullscreenPreview(): void {
     document.addEventListener("MSFullscreenChange", onFullscreenChange);
 }
 
-export {
-    initBrowserFullscreenPreview,
-};
+export { initBrowserFullscreenPreview };

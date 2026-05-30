@@ -6,10 +6,18 @@ import { Heightmap } from "./heightmap";
 import { EHeightmapMode, ETileMode, Parameters } from "./parameters";
 import { Tile } from "./tile";
 import { initBrowserFullscreenPreview } from "./fullscreen-preview";
+import { computeExportDimensions, clampExportToLimits } from "./export-dimensions";
+import { initUrlStateSync } from "./url-state-binding";
+import { installCopyLinkButton } from "./ui/copy-link-button";
+import { initTheme, installThemeToggle } from "./theme";
 
 import "./page-interface-generated";
 import "./ui-enhancements";
 
+// Wire up the theme system. The no-flash <head> script already applied the
+// theme before first paint; this re-asserts it defensively and hooks up live
+// reactions to OS theme changes.
+initTheme();
 
 function main(): void {
     const webglFlags = {
@@ -27,70 +35,93 @@ function main(): void {
     gl.enable(gl.DEPTH_TEST);
     gl.disable(gl.STENCIL_TEST);
 
-    const canvas = Page.Canvas.getCanvas();
+    const maybeCanvas = Page.Canvas.getCanvas();
+    if (!maybeCanvas) {
+        return;
+    }
+    const canvas: HTMLCanvasElement = maybeCanvas;
+
+    initUrlStateSync();
 
     const engine = new Engine();
     const heightmap = new Heightmap();
     const tile = new Tile();
 
     initBrowserFullscreenPreview();
+    installCopyLinkButton();
+    installThemeToggle();
 
     let nbFramesSinceLastUpdate = 0;
     setInterval(() => {
-        Page.Canvas.setIndicatorText("fps-indicator", Math.round(nbFramesSinceLastUpdate).toFixed(0));
+        Page.Canvas.setIndicatorText(
+            "fps-indicator",
+            Math.round(nbFramesSinceLastUpdate).toFixed(0)
+        );
         nbFramesSinceLastUpdate = 0;
 
         const currentTile = tile.current.texture;
-        Page.Canvas.setIndicatorText("tilesize-indicator", `${currentTile.width}x${currentTile.height}`);
+        Page.Canvas.setIndicatorText(
+            "tilesize-indicator",
+            `${currentTile.width}x${currentTile.height}`
+        );
 
         Page.Canvas.setIndicatorText("stripes-count-indicator", engine.stripesCount.toFixed(0));
     }, 1000);
 
     let needToDownload = false;
-    Parameters.imageDownloadObservers.push(() => { needToDownload = true; });
+    Parameters.imageDownloadObservers.push(() => {
+        needToDownload = true;
+    });
 
     let needToRedraw = true;
-    Parameters.redrawObservers.push(() => { needToRedraw = true; });
+    Parameters.redrawObservers.push(() => {
+        needToRedraw = true;
+    });
 
     let needToRecomputeNoiseTile = true;
-    Parameters.recomputeNoiseTileObservers.push(() => { needToRecomputeNoiseTile = true; });
+    Parameters.recomputeNoiseTileObservers.push(() => {
+        needToRecomputeNoiseTile = true;
+    });
 
     function mainLoop(): void {
         nbFramesSinceLastUpdate++;
 
         if (needToDownload) {
-            // Redraw at chosen export resolution; backing buffer is restored after toBlob (or immediately for IE).
+            // Redraw at chosen export resolution, then restore the original backing buffer once the blob is ready.
             const prevW = canvas.width;
             const prevH = canvas.height;
-            let [expW, expH] = computeExportDimensions(canvas, Parameters.downloadSize);
-            [expW, expH] = clampExportToWebGLLimits(expW, expH);
+            let [expW, expH] = computeExportDimensions(
+                canvas.clientWidth,
+                canvas.clientHeight,
+                Parameters.downloadSize
+            );
+            const maxRb = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE) as number;
+            const maxTex = gl.getParameter(gl.MAX_TEXTURE_SIZE) as number;
+            const maxVp = gl.getParameter(gl.MAX_VIEWPORT_DIMS) as Int32Array;
+            [expW, expH] = clampExportToLimits(
+                expW,
+                expH,
+                Math.min(maxRb, maxTex, maxVp[0]),
+                Math.min(maxRb, maxTex, maxVp[1])
+            );
             canvas.width = expW;
             canvas.height = expH;
             engine.draw(heightmap, tile);
 
-            const name = "stereogram.png";
-            if ((canvas as any).msToBlob) {
-                const blob = (canvas as any).msToBlob();
-                (window.navigator as any).msSaveBlob(blob, name);
+            canvas.toBlob((blob: Blob | null) => {
                 canvas.width = prevW;
                 canvas.height = prevH;
                 needToRedraw = true;
-            } else {
-                canvas.toBlob((blob: Blob | null) => {
-                    canvas.width = prevW;
-                    canvas.height = prevH;
-                    needToRedraw = true;
-                    if (!blob) {
-                        return;
-                    }
-                    const link = document.createElement("a");
-                    link.download = name;
-                    const url = URL.createObjectURL(blob);
-                    link.href = url;
-                    link.click();
-                    URL.revokeObjectURL(url);
-                });
-            }
+                if (!blob) {
+                    return;
+                }
+                const link = document.createElement("a");
+                link.download = "stereogram.png";
+                const url = URL.createObjectURL(blob);
+                link.href = url;
+                link.click();
+                URL.revokeObjectURL(url);
+            });
             needToDownload = false;
         }
 
@@ -113,39 +144,6 @@ function main(): void {
         requestAnimationFrame(mainLoop);
     }
     mainLoop();
-}
-
-/** Longest side = targetPx; preserves aspect ratio from layout (clientWidth / clientHeight). */
-function computeExportDimensions(canvas: HTMLCanvasElement, targetLongest: number): [number, number] {
-    const cw = canvas.clientWidth > 0 ? canvas.clientWidth : 1;
-    const ch = canvas.clientHeight > 0 ? canvas.clientHeight : 1;
-    const aspect = cw / ch;
-    let w: number;
-    let h: number;
-    if (cw >= ch) {
-        w = targetLongest;
-        h = Math.max(1, Math.round(targetLongest / aspect));
-    } else {
-        h = targetLongest;
-        w = Math.max(1, Math.round(targetLongest * aspect));
-    }
-    return [w, h];
-}
-
-function clampExportToWebGLLimits(w: number, h: number): [number, number] {
-    const maxRb = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE) as number;
-    const maxTex = gl.getParameter(gl.MAX_TEXTURE_SIZE) as number;
-    const maxVp = gl.getParameter(gl.MAX_VIEWPORT_DIMS) as Int32Array;
-    const maxW = Math.min(maxRb, maxTex, maxVp[0]);
-    const maxH = Math.min(maxRb, maxTex, maxVp[1]);
-    if (w <= maxW && h <= maxH) {
-        return [w, h];
-    }
-    const scale = Math.min(maxW / w, maxH / h);
-    return [
-        Math.max(1, Math.floor(w * scale)),
-        Math.max(1, Math.floor(h * scale)),
-    ];
 }
 
 main();

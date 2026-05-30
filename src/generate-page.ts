@@ -9,37 +9,34 @@ const data = {
     introduction: [
         "An autostereogram (also known as Magic Eye) is a 2D image designed to create the illusion of 3D. In each image, there is a 3D object that can only be viewed by looking at the image a certain way, as if the screen was transparent and you looked at the wall behind it. It gets easier with practice.",
         "Autostereograms were very popular in the '90s. They take advantage of stereopsis: the brain tries to reconstruct depth by combining the two slightly different images perceived by each eye.",
-        "In this project, you can use your own depth map, customize the tiles as well as the way the image is computed. It all runs on GPU and can also handle live moving scenes in real time."
+        "In this project, you can use your own depth map, customize the tiles as well as the way the image is computed. It all runs on GPU and can also handle live moving scenes in real time.",
     ],
     githubProjectName: "stereogram-webgl",
     readme: {
         filepath: path.join(__dirname, "..", "README.md"),
-        branchName: "main"
+        branchName: "main",
     },
     additionalLinks: [],
     styleFiles: [],
-    scriptFiles: [
-        "script/gl-matrix-2.5.1-min.js",
-        "script/main.min.js"
-    ],
+    scriptFiles: ["script/gl-matrix-2.5.1-min.js", "script/main.min.js"],
     indicators: [
         {
             id: "fps-indicator",
-            label: "FPS"
+            label: "FPS",
         },
         {
             id: "stripes-count-indicator",
-            label: "Stripes count"
+            label: "Stripes count",
         },
         {
             id: "tilesize-indicator",
-            label: "Tile size"
+            label: "Tile size",
         },
     ],
     canvas: {
         width: 512,
         height: 512,
-        enableFullscreen: true
+        enableFullscreen: true,
     },
     controlsSections: [
         {
@@ -58,7 +55,7 @@ const data = {
                     min: 0,
                     max: 1,
                     value: 1,
-                    step: 0.01
+                    step: 0.01,
                 },
                 {
                     type: Demopage.supportedControls.Checkbox,
@@ -81,7 +78,7 @@ const data = {
                             label: "Moving",
                             value: "moving",
                         },
-                    ]
+                    ],
                 },
                 {
                     type: Demopage.supportedControls.Select,
@@ -133,8 +130,8 @@ const data = {
                         {
                             value: "ship.png",
                             label: "Ship",
-                        }
-                    ]
+                        },
+                    ],
                 },
                 {
                     type: Demopage.supportedControls.Select,
@@ -162,17 +159,17 @@ const data = {
                         {
                             value: "atomium",
                             label: "Atomium",
-                        }
-                    ]
+                        },
+                    ],
                 },
                 {
                     type: Demopage.supportedControls.FileUpload,
                     title: "Custom",
                     id: "input-heightmap-upload-button",
                     accept: [".png", ".jpg", ".bmp", ".webp"],
-                    defaultMessage: "Upload a depth map"
+                    defaultMessage: "Upload a depth map",
                 },
-            ]
+            ],
         },
         {
             title: "Tile",
@@ -190,9 +187,9 @@ const data = {
                         },
                         {
                             label: "Noise",
-                            value: "noise"
+                            value: "noise",
                         },
-                    ]
+                    ],
                 },
                 {
                     type: Demopage.supportedControls.Select,
@@ -204,7 +201,7 @@ const data = {
                             value: "wallpaper.png",
                             label: "Wallpaper",
                         },
-                        
+
                         {
                             value: "space.png",
                             label: "Space",
@@ -225,8 +222,8 @@ const data = {
                         {
                             value: "leaves.png",
                             label: "Leaves",
-                        }
-                    ]
+                        },
+                    ],
                 },
                 {
                     type: Demopage.supportedControls.Range,
@@ -235,7 +232,7 @@ const data = {
                     min: 8,
                     max: 64,
                     value: 16,
-                    step: 1
+                    step: 1,
                 },
                 {
                     type: Demopage.supportedControls.Checkbox,
@@ -254,9 +251,9 @@ const data = {
                     title: "Custom",
                     id: "input-tile-upload-button",
                     accept: [".png", ".jpg", ".bmp", ".webp"],
-                    defaultMessage: "Upload a pattern"
+                    defaultMessage: "Upload a pattern",
                 },
-            ]
+            ],
         },
         {
             title: "Pattern placement",
@@ -268,7 +265,7 @@ const data = {
                     min: -0.5,
                     max: 0.5,
                     value: 0,
-                    step: 0.01
+                    step: 0.01,
                 },
                 {
                     type: Demopage.supportedControls.Range,
@@ -277,7 +274,7 @@ const data = {
                     min: -0.5,
                     max: 0.5,
                     value: 0,
-                    step: 0.01
+                    step: 0.01,
                 },
                 {
                     type: Demopage.supportedControls.Range,
@@ -286,7 +283,7 @@ const data = {
                     min: 0.25,
                     max: 4,
                     value: 1,
-                    step: 0.01
+                    step: 0.01,
                 },
                 {
                     type: Demopage.supportedControls.Range,
@@ -295,7 +292,7 @@ const data = {
                     min: 0.5,
                     max: 2,
                     value: 1,
-                    step: 0.01
+                    step: 0.01,
                 },
                 {
                     type: Demopage.supportedControls.Range,
@@ -304,9 +301,9 @@ const data = {
                     min: 0.5,
                     max: 2,
                     value: 1,
-                    step: 0.01
+                    step: 0.01,
                 },
-            ]
+            ],
         },
         {
             title: "Pattern crop",
@@ -318,7 +315,7 @@ const data = {
                     min: 0,
                     max: 1,
                     value: 0,
-                    step: 0.01
+                    step: 0.01,
                 },
                 {
                     type: Demopage.supportedControls.Range,
@@ -327,7 +324,7 @@ const data = {
                     min: 0,
                     max: 1,
                     value: 1,
-                    step: 0.01
+                    step: 0.01,
                 },
                 {
                     type: Demopage.supportedControls.Range,
@@ -336,7 +333,7 @@ const data = {
                     min: 0,
                     max: 1,
                     value: 0,
-                    step: 0.01
+                    step: 0.01,
                 },
                 {
                     type: Demopage.supportedControls.Range,
@@ -345,9 +342,9 @@ const data = {
                     min: 0,
                     max: 1,
                     value: 1,
-                    step: 0.01
+                    step: 0.01,
                 },
-            ]
+            ],
         },
         {
             title: "Stripes",
@@ -375,7 +372,7 @@ const data = {
                             value: "custom",
                             label: "Custom",
                         },
-                    ]
+                    ],
                 },
                 {
                     type: Demopage.supportedControls.Range,
@@ -384,7 +381,7 @@ const data = {
                     min: 0,
                     max: 1000,
                     value: 500,
-                    step: 1
+                    step: 1,
                 },
                 {
                     type: Demopage.supportedControls.Tabs,
@@ -401,7 +398,7 @@ const data = {
                             value: "fixed",
                             label: "Fixed",
                         },
-                    ]
+                    ],
                 },
                 {
                     type: Demopage.supportedControls.Range,
@@ -410,7 +407,7 @@ const data = {
                     min: 20,
                     max: 200,
                     value: 80,
-                    step: 1
+                    step: 1,
                 },
                 {
                     type: Demopage.supportedControls.Range,
@@ -419,7 +416,7 @@ const data = {
                     min: 8,
                     max: 24,
                     value: 16,
-                    step: 1
+                    step: 1,
                 },
                 {
                     type: Demopage.supportedControls.Checkbox,
@@ -427,7 +424,7 @@ const data = {
                     id: "show-uv-checkbox-id",
                     checked: false,
                 },
-            ]
+            ],
         },
         {
             title: "Output",
@@ -485,11 +482,11 @@ const data = {
                 {
                     type: Demopage.supportedControls.FileDownload,
                     id: "image-download-id",
-                    label: "Download image"
-                }
-            ]
-        }
-    ]
+                    label: "Download image",
+                },
+            ],
+        },
+    ],
 };
 
 /**
@@ -503,7 +500,10 @@ const ORIGINAL_AUTHOR_ATTRIBUTION_CSS = `
 .page-attribution{margin-top:12px;font-size:14px;line-height:1.4;color:#5e5e5e;color:var(--var-color-block-actionitem,#5e5e5e)}.page-attribution a{color:inherit;text-decoration:underline}.page-attribution a:hover{color:#7e7e7e;color:var(--var-color-block-actionitem-hover,#7e7e7e)}
 `;
 
-function patchGeneratedHtml(filepath: string, options: { stripProjectLinks: boolean; stripHeaderAndIntro?: boolean }): void {
+function patchGeneratedHtml(
+    filepath: string,
+    options: { stripProjectLinks: boolean; stripHeaderAndIntro?: boolean }
+): void {
     let html = fs.readFileSync(filepath, "utf8");
     // `description` contains a nested `project-links` div; strip that first so intro removal can match cleanly.
     if (options.stripProjectLinks) {
@@ -513,7 +513,7 @@ function patchGeneratedHtml(filepath: string, options: { stripProjectLinks: bool
         html = html.replace(/<header>[\s\S]*?<\/header>\s*/, "");
         html = html.replace(
             /<div class="intro">\s*<h1>[\s\S]*?<\/h1>\s*<div class="description">[\s\S]*?<\/div>\s*<\/div>\s*/,
-            "",
+            ""
         );
     }
     if (html.indexOf("page-attribution") === -1) {
@@ -549,7 +549,10 @@ fs.writeFileSync(SCRIPT_DECLARATION_FILEPATH, buildResult.pageScriptDeclaration)
 
 fse.copySync(path.join(SRC_DIR, "static"), DEST_DIR);
 
-patchGeneratedHtml(path.join(DEST_DIR, "index.html"), { stripProjectLinks: true, stripHeaderAndIntro: true });
+patchGeneratedHtml(path.join(DEST_DIR, "index.html"), {
+    stripProjectLinks: true,
+    stripHeaderAndIntro: true,
+});
 const readmeIndexPath = path.join(DEST_DIR, "readme", "index.html");
 if (fs.existsSync(readmeIndexPath)) {
     patchGeneratedHtml(readmeIndexPath, { stripProjectLinks: false });

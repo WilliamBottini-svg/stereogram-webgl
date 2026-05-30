@@ -11,7 +11,7 @@ const MAX_INCLUDE_DEPTH = 10;
  * Resolves every #include "XXX" directive in shader source files.
  * Every path is resolved from the SRC_DIR directory.
  * Cyclic includes are not supported.
- * @param {string} filepath 
+ * @param {string} filepath
  * @return {string}
  */
 function resolveIncludes(filepath) {
@@ -22,12 +22,11 @@ function resolveIncludes(filepath) {
     do {
         includesLeft = 0;
 
-        processedStr = processedStr.replace(/^\s*#include\s*\"(.*)\"\s*$/mg,
-            (match, p1) => {
-                includesLeft++;
-                const fullpath = path.join(SRC_DIR, p1);
-                return fs.readFileSync(fullpath).toString();
-            });
+        processedStr = processedStr.replace(/^\s*#include\s*\"(.*)\"\s*$/gm, (match, p1) => {
+            includesLeft++;
+            const fullpath = path.join(SRC_DIR, p1);
+            return fs.readFileSync(fullpath).toString();
+        });
 
         includeDepth++;
         if (includeDepth === MAX_INCLUDE_DEPTH) {
@@ -38,14 +37,11 @@ function resolveIncludes(filepath) {
     return processedStr;
 }
 
-
-
-
 function scanDirectory(directory /* string */) /* void */ {
     fse.ensureDirSync(path.join(DST_DIR, directory));
-    
+
     const fullDirectory = path.join(SRC_DIR, directory);
-    fs.readdirSync(fullDirectory).forEach(file => {
+    fs.readdirSync(fullDirectory).forEach((file) => {
         const srcFilepath = path.join(fullDirectory, file);
 
         if (fs.statSync(srcFilepath).isDirectory()) {

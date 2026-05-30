@@ -1,155 +1,185 @@
-# stereogram-webgl
-An autostereogram (also known as Magic Eye) is a 2D image designed to create the illusion of 3D. In each image, there is a 3D object that can only be viewed by looking at the image a certain way, as if the screen was transparent and you looked at the wall behind it. It gets easier with practice.
+# stereogram-webgl-extended
 
-Autostereograms were very popular in the '90s. They take advantage of stereopsis: the brain tries to reconstruct depth by combining the two slightly different images perceived by each eye.
+A real-time WebGL autostereogram ("Magic Eye") generator. Upload a depth map and a tile pattern, tweak the parameters, and download the result.
 
-In this project, you can use your own depth map, customize the tiles as well as the way the image is computed. It all runs on GPU and can also handle live moving scenes in real time.
+**Live demo:** https://williambottini-svg.github.io/stereogram-webgl
 
-See it live [here](https://piellardj.github.io/stereogram-webgl/).
+![Planet](src/readme/preview_planet.jpg)
+
+---
+
+## About this fork
+
+This project is a fork of [piellardj/stereogram-webgl](https://github.com/piellardj/stereogram-webgl) by Jérémie Piellard, the original author of the WebGL stereogram engine. The core rendering algorithm, shader pipeline, and build scripts are his work.
+
+**What I added on top:**
+
+| Feature | Commit |
+|---|---|
+| Pattern placement controls (offset X/Y, zoom, repeat scales) | [`1bfa465`](../../commit/1bfa465) |
+| Pattern cropping controls (X/Y min/max) | [`7ff371c`](../../commit/7ff371c) |
+| Fullscreen preview module (square / fill modes, browser fullscreen) — 265 LOC, new module at `src/ts/fullscreen-preview.ts` | [`3151aaf`](../../commit/3151aaf) |
+| Download-size selector (1024 / 2048 / 4096) and UI/attribution refactor | [`b727a86`](../../commit/b727a86) |
+| Service worker to handle stale registrations | [`3151aaf`](../../commit/3151aaf) |
+
+## Redesigned UI
+
+The original project ships with a generic control-panel theme. This fork replaces it with a custom design system that fully restyles the app:
+
+- **CSS custom-property palette** (light and dark) — theming is just a token swap on `[data-theme="dark"]`, no per-component dark-mode rules. See [`src/static/css/custom.css`](src/static/css/custom.css).
+- **Dark / light mode toggle** with `prefers-color-scheme` as the default, explicit choice persisted to `localStorage`. A small inline script in `<head>` applies the theme before first paint so there's no light-to-dark flash on dark-preferred systems.
+- **CSS Grid app shell**: canvas + control panel layout that adapts to viewport width.
+- **Container queries on the control panel** so it reflows based on its own width (works the same whether docked, floated, or in a narrow sheet).
+- **Mobile bottom-sheet**: under 900 px wide the control panel becomes a draggable sheet that slides up from the bottom of the screen.
+- **A11y baked in**: visible `:focus-visible` rings, sufficient WCAG-AA contrast, ARIA labels on the floating buttons, `prefers-reduced-motion` honored.
+- **Frosted-glass canvas buttons** with `backdrop-filter` blur, sized for touch targets (36 px) but compact.
+
+The new design lives entirely in `src/static/css/custom.css` (loaded after the framework's `page.css` and overrides most of it) and `src/ts/theme.ts` (theme toggle module). The HTML structure is preserved so the existing observers and framework runtime keep working.
+
+## Shareable URL state
+
+Every numeric, boolean, and enum parameter is encoded into the URL hash, so any configuration is a copy-pasteable link. Click the **Copy link** button in the top-right corner to grab one.
+
+Design notes (the things I'd talk about in an interview):
+
+- Compact `key=value&key=value` format in the hash (`#d=0.5&sc=12&tm=texture&...`) rather than base64-of-JSON. Human-readable, diffable, and unknown keys are silently ignored on decode so older links keep working as the schema grows.
+- Short keys (e.g. `d` for depth, `cu0`/`cu1` for tile-crop min/max U) keep URLs paste-friendly.
+- Floats are quantized to 4 decimal places before encoding — well below slider precision and roughly halves URL length.
+- Writes use `history.replaceState` and are debounced 250 ms, so dragging a slider doesn't spam browser history.
+- File-backed parameters (uploaded depth maps, uploaded pattern textures) are intentionally excluded — a URL hash is far too small to embed an image. Preset names are encoded; uploads aren't.
+
+The codec lives in [`src/ts/url-state.ts`](src/ts/url-state.ts) (pure functions, fully unit-tested) and the UI binding lives in [`src/ts/url-state-binding.ts`](src/ts/url-state-binding.ts).
+
+## Modern tooling
+
+This fork adds the engineering infrastructure that wasn't in the original:
+
+- **ESLint flat config + Prettier** (the original used `tslint`, deprecated since 2019).
+- **Strict TypeScript**: `strict` + `strictNullChecks` on, ES2020 target.
+- **GitHub Actions CI** runs lint, format-check, typecheck, tests, and the webpack bundle on every push.
+- **Vitest test suite** (70 tests) covering the pure logic — export-dimension math, the URL state codec — and the URL binding layer, where the `Page` framework and `Parameters` singleton are substituted with recording fakes so no browser is needed. See `src/ts/**/*.test.ts`.
+- **Husky pre-commit hook** runs lint + typecheck + tests locally before each commit.
+
+---
 
 ## Run locally
 
 1. Install [Node.js](https://nodejs.org/) **18.16 or newer** (see `engines` in `package.json`).
-2. In the project folder, install dependencies and build the site:
+2. From the project folder, install dependencies and build:
 
    ```bash
    npm install
    npm run build
    ```
 
-3. Start a local server and open **http://localhost:8080** in your browser:
+3. Serve `docs/` on `http://localhost:8080`:
 
    ```bash
    npm run http-server
    ```
 
-To rebuild after you change source files, run `npm run build` again (or use `npm run webpack:watch` in another terminal while `http-server` stays running).
+To rebuild on source changes: run `npm run build` again, or `npm run webpack:watch` in another terminal alongside `http-server`.
 
-See my Magic Eye solver [here](https://piellardj.github.io/stereogram-solver/).
+## How a stereogram works
 
-[![Donate](https://raw.githubusercontent.com/piellardj/piellardj.github.io/master/images/readme/donate-paypal.svg)](https://www.paypal.com/donate/?hosted_button_id=AF7H7GEJTL95E)
+*(This section is from the original project, lightly edited. Full credit to Jérémie Piellard for the explanation and diagrams.)*
 
-## Preview
-
-![Planet](src/readme/preview_planet.jpg)
-
-![Ship](src/readme/preview_ship.jpg)
-
-![Ripple](src/readme/preview_ripple.jpg)
-
-## How to see a stereogram image
-### Instructions
-Seeing the 3D scene hidden in a stereogram image takes a bit of practice. The key is to look beyond the image, and not focus the image itself. There are several techniques to do it:
-- if you are able to, just consciously relax your eyes like if you were looking in the distance
-- another technique is to start with your head very close to the screen, so close that you cannot focus it. At this point your eyes should naturally look in the distance. Then move your head back slowly, and don't look at the screen: try to keep your eyes looking in the vague
-- another one is to use an object like a pen: place it behind your screen, on the side so you can see it. Keep staring at it, and move it slowly towards the center of the screen. This should help you look beyond the screen.
-
-If you cannot quite see a clear 3D object but you still feel something weird, you are certainly on good track.
-
-### Exercises
-Below are images you can practice on while training. For each of them, you need to have the correct way of looking at them.
-
-<div style="text-align:center;margin:48px 0">
-    <p>
-        <i>Try to relax your eyes, and you should see a third black dot appear in the middle.</i>
-    </p>
-    <img alt="First practice image" src="src/readme/tutorial_easy.png"/>
-</div>
-
-<div style="text-align:center;margin:48px 0">
-    <p>
-        <i>Practice your look on this image, and you should see each row float at a different depth: the daisies look far away, the red flowers are a bit closer, then the blue butterfly, and finally the yellow flowers are the closest.</i>
-    </p>
-    <img alt="Second practice image" src="src/readme/tutorial_medium.png"/>
-</div>
-
-<div style="text-align:center;margin:48px 0">
-    <p>
-        <i>This is the last practice image. If you look at it correctly, you should clearly see a 3D object.</i>
-    </p>
-    <img alt="Last practice image" src="src/readme/tutorial_hard.jpg"/>
-</div>
-
-## How does it work
 ### Base idea
 
-The brain perceives depth by combining the two slightly different images coming from our eyes. If an object looks exactly the same from both eyes, it means the object is far in the distance. On the contrary, if an object looks very different from each eye, it means the eyes each have a different perspective on it, so the object must be very close.
+The brain perceives depth by combining the two slightly different images coming from our eyes. If an object looks exactly the same from both eyes, it's far in the distance; if it looks very different from each eye, the eyes have different perspectives on it and it's very close.
 
-Since depth perception is based on binocular vision, if we want the show a 3D object in our 2D image, we must trick the brain into thinking each eye sees a different perspective of our 3D object. If you look directly at the image, it does not work: the brain clearly sees the image is 2D. So the viewer has to focus a point either before the image, or behind it.
+Since depth perception is binocular, to show a 3D object in a 2D image we need to trick the brain into thinking each eye sees a different perspective. Looking directly at the image doesn't work — the brain sees it's flat. The viewer has to focus a point either before the image or behind it.
 
-Now, we must understand how to build the image. Let's see what happens if someones looks at an object through a transparent screen:
+Now consider what happens when someone looks at an object through a transparent screen:
 
 <div style="text-align:center">
     <img alt="Depth creates repetition" src="src/readme/diagram-01.png"/>
-    <p>
-        <i>As you can see, there are two "ghosts" of the object on the screen, because of the eyes having different positions relatively to the object.</i>
-    </p>
+    <p><i>There are two "ghosts" of the object on the screen because the eyes see it from different positions.</i></p>
 </div>
 
-Now let's compare two situations: one object is near and the other is far away:
+Compare a near object to a far one:
 
 <div style="text-align:center">
     <img alt="Repetition period vary with distance" src="src/readme/diagram-02.png"/>
-    <p>
-        <i>The closer an object is to the screen, the closer its ghosts are on the screen.</i>
-    </p>
+    <p><i>The closer an object is to the screen, the closer its ghosts are on the screen.</i></p>
 </div>
 
-In conclusion, provided the viewer does not look directly at the image but beyond it, if we repeat some pattern on the image, the brain will interpret it as the pattern actually being behind the screen. Moreover, by changing the frequency of the repetitions, we can create an impression of relative depth: a pattern with close repetitions will appear closer than a pattern with distanced repetitions. This explains why on the image below, the daisies appear further away than the butterflies.
+So: if the viewer looks beyond the image and we repeat a pattern, the brain interprets it as the pattern actually being behind the screen. Varying the repetition frequency creates the illusion of relative depth.
 
 <div style="text-align:center">
     <img alt="Depth perception and repetition frequency" src="src/readme/tutorial_medium.png"/>
-    <p>
-        <i>When looking beyond this image, the daisies appear further away than the butterflies because of the difference in repetition frequency.</i>
-    </p>
+    <p><i>Daisies appear further away than butterflies because of the difference in repetition frequency.</i></p>
 </div>
 
-Another interesting property is that only one repetition is needed to perceive depth. This means that on a same row, we can vary the perceived depth by changing the frequency of the repetitions, creating a slope effect.
+Only one repetition is needed to perceive depth, so on a single row varying the repetition frequency creates a slope:
 
 <div style="text-align:center">
     <img alt="We can change depth on a single row" src="src/readme/frequency-change.png"/>
-    <p>
-        <i>On each row, the repetition frequency varies. This gives the perception of depth variation on each row.</i>
-    </p>
+    <p><i>On each row, the repetition frequency varies, giving the perception of depth variation.</i></p>
 </div>
 
 ### Algorithm
-We want to generate an autostereogram given the following inputs:
-- a depth map encoded as a black and white image, in this example a sphere;
-- a base pattern, in this example a seamless clouds texture.
 
-Since this is all about repetition, let's define our base repetition period in pixels. Then let's split our target image into vertical stripes, each having the repetition period as width.
+Inputs:
+
+- a depth map encoded as a black-and-white image (in this example, a sphere)
+- a base pattern (in this example, a seamless clouds texture)
+
+Pick a base repetition period in pixels. Split the target image into vertical stripes, each one period wide.
 
 <div style="text-align:center">
     <img alt="Image split in stripes" src="src/readme/demo_stripes_empty.png"/>
-    <p>
-        <i>Target image split into 5 vertical stripes, plus the reference stripe on the left.</i>
-    </p>
+    <p><i>Target image split into 5 vertical stripes plus the reference stripe on the left.</i></p>
 </div>
 
-Since this is all about repetition, let's make each stripe a repetition of the previous one. The far-left stripe serves as reference:
+Make each stripe a repetition of the previous one. The far-left stripe is the reference:
 
 <div style="text-align:center">
     <img alt="Repetition without displacement" src="src/readme/demo_stripes.png"/>
-    <p>
-        <i>By repeating the first stripe without displacement, the viewer only perceives a flat surface.</i>
-    </p>
+    <p><i>Repeating the first stripe without displacement: the viewer perceives a flat surface.</i></p>
 </div>
 
-Now we want to make it 3D, so let's introduce horizontal displacement: each stripe will be a displaced version of the previous one. Each pixel has a distinct local displacement, given by sampling the depth map at that position. Since the far-left stripe is the first one, it does not have a reference so it will not be deformed. However I do not want to truncate the depth map, so just scale it down and shift it to the right so that all of it is sampled.
+Introduce horizontal displacement so each stripe is a displaced version of the previous one. Each pixel's local displacement comes from sampling the depth map at that position. The leftmost stripe has no reference to displace from, so the depth map is scaled and shifted right so all of it is sampled:
 
 <div style="text-align:center">
     <img alt="Repetition with displacement" src="src/readme/demo_final.png"/>
-    <p>
-        <i>By repeating the first stripe and adding with displacement, the viewer perceives the 3D objects.</i>
-    </p>
+    <p><i>Repeating the first stripe with displacement: the viewer perceives 3D objects.</i></p>
 </div>
 
-In the end, every pixel on the image is a displaced version of the source stripe. Here is an illustration to better see the displacement:
+Every pixel ends up being a displaced version of the source stripe. Displaying the UV coordinates makes the displacement visible:
 
 <div style="text-align:center">
     <img alt="Repetition with displacement" src="src/readme/demo_uv.png"/>
-    <p>
-        <i>By displaying the UV coordinates the tile will be sampled at, the displacement is more visible. One can clearly see the sphere-shaped displacement sampled from the depth map.</i>
-    </p>
+    <p><i>The sphere-shaped displacement sampled from the depth map is clearly visible.</i></p>
 </div>
+
+## How to see a stereogram
+
+Seeing the 3D scene takes practice. The key is to look *beyond* the image, not at it:
+
+- Consciously relax your eyes as if looking into the distance.
+- Or: start with your head very close to the screen — so close you can't focus — then move back slowly without re-focusing.
+- Or: hold a pen behind the screen, off to the side, stare at the pen, then slowly move it toward the center of the screen.
+
+If you can't quite see a clear 3D object but you feel something weird, you're on the right track.
+
+### Practice images
+
+<div style="text-align:center;margin:48px 0">
+    <p><i>Relax your eyes and a third black dot should appear in the middle.</i></p>
+    <img alt="Easy practice" src="src/readme/tutorial_easy.png"/>
+</div>
+
+<div style="text-align:center;margin:48px 0">
+    <p><i>Each row should float at a different depth: daisies far away, red flowers closer, blue butterfly closer still, yellow flowers closest.</i></p>
+    <img alt="Medium practice" src="src/readme/tutorial_medium.png"/>
+</div>
+
+<div style="text-align:center;margin:48px 0">
+    <p><i>Looked at correctly, a clear 3D object appears.</i></p>
+    <img alt="Hard practice" src="src/readme/tutorial_hard.jpg"/>
+</div>
+
+## License
+
+MIT. See [`LICENSE`](LICENSE) — copyright is split between the original author (Jérémie Piellard, 2021) and the modifications in this fork (William Bottini, 2026).

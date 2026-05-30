@@ -1,6 +1,5 @@
 import "./page-interface-generated";
 
-
 const loadingObjects: { [id: string]: boolean } = {};
 
 function registerLoadingObject(id: string): void {
@@ -18,8 +17,4 @@ function registerLoadedObject(id: string): void {
     }
 }
 
-export {
-    registerLoadedObject,
-    registerLoadingObject,
-};
-
+export { registerLoadedObject, registerLoadingObject };

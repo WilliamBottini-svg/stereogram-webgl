@@ -1,20 +1,32 @@
 {
-  "name": "stereogram-webgl",
-  "homepage": "https://piellardj.github.io/stereogram-webgl",
-  "author": "Jérémie PIELLARD <jeremie.piellard@gmail.com> (https://github.com/piellardj)",
-  "repository": "github:piellardj/stereogram-webgl",
+  "name": "stereogram-webgl-extended",
+  "description": "WebGL autostereogram generator. Fork of piellardj/stereogram-webgl extended with pattern placement, cropping, fullscreen preview, shareable URL state, and a redesigned UI.",
+  "homepage": "https://williambottini-svg.github.io/stereogram-webgl",
+  "author": "William Bottini <william.bottini@gmail.com> (https://github.com/williambottini-svg)",
+  "contributors": [
+    "Jérémie Piellard <jeremie.piellard@gmail.com> (https://github.com/piellardj) — original project"
+  ],
+  "repository": "github:williambottini-svg/stereogram-webgl",
   "private": true,
   "scripts": {
-    "pre-commit": "npm run rebuild && npm run lint",
     "http-server": "http-server ./docs -p 8080",
     "build-page": "ts-node-script src/generate-page.ts",
     "build-shaders": "node src/build-shaders.js",
-    "build": "npm run build-page && npm run build-shaders && npm run webpack",
+    "build-static": "node src/build-static.js",
+    "build": "npm run build-page && npm run build-shaders && npm run build-static && npm run webpack",
+    "build:no-page": "npm run build-shaders && npm run build-static && npm run webpack",
     "clean": "shx rm -rf docs/* **/*generated.*",
-    "lint": "tslint -c src/config/tslint.json -p src/config/tsconfig.json --fix",
+    "lint": "eslint src/ts",
+    "lint:fix": "eslint src/ts --fix",
+    "format": "prettier --write \"src/**/*.{ts,js,json,css,html}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,js,json,css,html}\"",
+    "typecheck": "tsc --noEmit -p src/config/tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "rebuild": "npm run clean && npm run build",
     "webpack": "webpack --config src/config/webpack.config.js",
-    "webpack:watch": "webpack --config src/config/webpack.config.js --watch"
+    "webpack:watch": "webpack --config src/config/webpack.config.js --watch",
+    "prepare": "husky"
   },
   "engines": {
     "node": ">=18.16.0"
@@ -22,13 +34,20 @@
   "devDependencies": {
     "@types/fs-extra": "^11.0.1",
     "@types/node": "^20.3.0",
+    "@typescript-eslint/eslint-plugin": "^8.59.4",
+    "@typescript-eslint/parser": "^8.59.4",
+    "eslint": "^9.39.4",
+    "eslint-config-prettier": "^9.1.2",
     "fs-extra": "^11.1.1",
     "http-server": "^14.1.1",
+    "husky": "^9.1.7",
+    "prettier": "^3.8.3",
     "shx": "^0.3.4",
     "ts-loader": "^9.4.3",
     "ts-node": "^10.9.1",
-    "tslint": "^6.1.3",
     "typescript": "^5.1.3",
+    "typescript-eslint": "^8.59.4",
+    "vitest": "^2.1.9",
     "webpack": "^5.86.0",
     "webpack-cli": "^5.1.4",
     "webpage-templates": "github:piellardj/webpage-templates"
