@@ -11,7 +11,8 @@ interface IScenePreset {
     cameraPosition: [number, number, number];
     nearPlane: number;
     farPlane: number;
-    model?: ObjModel; // "undefined" if not loaded, null if loading, ObjModel if loaded
+    /** `undefined` if not requested yet, `null` while loading, the model once loaded. */
+    model?: ObjModel | null;
 }
 
 const presets: { [id: string]: IScenePreset } = {
@@ -98,8 +99,8 @@ class Scene {
             gl.viewport(0, 0, this._depthMap.width, this._depthMap.height);
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // tslint:disable-line:no-bitwise
 
-            if (typeof modelPreset.model === "undefined") {
-                modelPreset.model = undefined;
+            if (modelPreset.model === undefined) {
+                modelPreset.model = null; // mark as loading so we don't request the file again next frame
                 const loadedModelId = Parameters.modelId;
                 asyncLoadObjModel(modelPreset.modelName, (model: ObjModel) => {
                     if (loadedModelId === Parameters.modelId) {

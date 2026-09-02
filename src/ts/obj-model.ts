@@ -10,7 +10,7 @@ interface IPoint {
 
 class ObjModel {
     public readonly trianglesCount: number;
-    public readonly data: Float32Array;
+    public readonly data: Float32Array<ArrayBuffer>;
     public readonly VBO: VBO;
 
     public static parse(input: string): ObjModel {
@@ -83,7 +83,7 @@ class ObjModel {
         return new ObjModel(new Float32Array(geometry));
     }
 
-    public constructor(data: Float32Array) {
+    public constructor(data: Float32Array<ArrayBuffer>) {
         if (data.length % 9 !== 0) {
             throw new Error(`Invalid data: ${data.length}`);
         }

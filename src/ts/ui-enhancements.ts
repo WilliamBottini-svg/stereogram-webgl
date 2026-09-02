@@ -14,7 +14,8 @@ function injectStyles(): void {
     display: flex;
     align-items: center;
     gap: 6px;
-    width: 7em;
+    width: auto;
+    min-width: 7em;
     margin: 0;
     padding: 0;
     border: none;

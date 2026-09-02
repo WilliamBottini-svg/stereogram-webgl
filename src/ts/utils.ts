@@ -37,7 +37,11 @@ function asyncLoadShader(
 let hiddenCanvas: HTMLCanvasElement;
 let hiddenCanvasContext: CanvasRenderingContext2D;
 
-function createImageData(width: number, height: number, data: Uint8ClampedArray): ImageData {
+function createImageData(
+    width: number,
+    height: number,
+    data: Uint8ClampedArray<ArrayBuffer>
+): ImageData {
     if (data.length !== width * height * 4) {
         throw new Error(
             `Incoherent image data: width=${width} height=${height} data.length=${data.length}`

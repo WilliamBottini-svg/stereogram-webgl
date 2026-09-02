@@ -597,9 +597,62 @@ select:focus-visible {
 
 /* ============================================================
  * File / upload control
+ *
+ * Markup (from the framework):
+ *   <div class="file-control upload"><input class="file-input"><label class="file-control-button">…</label></div>
+ * The framework paints the inner label as an outlined button in the accent colour. We turn
+ * that label into a filled button; the wrapper itself stays unstyled. (Styling the wrapper
+ * used to give accent text on an accent background, i.e. an unreadable blank button.)
  * ============================================================ */
 
-.file-control,
+.file-control {
+    display: inline-block;
+    position: relative;
+}
+
+.file-control > input.file-input + .file-control-button {
+    display: inline-block;
+    padding: 6px var(--s-3) 6px 2em;
+    background: var(--c-accent);
+    color: var(--c-accent-fg);
+    border: 2px solid var(--c-accent);
+    border-radius: var(--r-md);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+        background-color var(--t-fast),
+        border-color var(--t-fast);
+}
+
+.file-control.compact > input.file-input + .file-control-button {
+    padding: 4px var(--s-3) 4px 2em;
+    font-size: 13px;
+}
+
+.file-control > input.file-input + .file-control-button > svg {
+    fill: var(--c-accent-fg);
+}
+
+.file-control > input.file-input:focus + .file-control-button,
+.file-control > input.file-input:hover:not(:disabled) + .file-control-button,
+.file-control > input.file-input:active:not(:disabled) + .file-control-button {
+    background: var(--c-accent-hover);
+    border-color: var(--c-accent-hover);
+    color: var(--c-accent-fg);
+}
+
+.file-control > input.file-input:focus + .file-control-button > svg,
+.file-control > input.file-input:hover:not(:disabled) + .file-control-button > svg,
+.file-control > input.file-input:active:not(:disabled) + .file-control-button > svg {
+    fill: var(--c-accent-fg);
+}
+
+.file-control > input.file-input:focus-visible + .file-control-button {
+    outline: 2px solid var(--c-accent);
+    outline-offset: 2px;
+}
+
 .button {
     display: inline-block;
     padding: 6px var(--s-3);
@@ -613,7 +666,6 @@ select:focus-visible {
     transition: background-color var(--t-fast);
 }
 
-.file-control:hover,
 .button:hover {
     background: var(--c-accent-hover);
 }
@@ -790,6 +842,12 @@ footer a {
 }
 
 #error-messages:empty {
+    display: none;
+}
+
+/* The block always contains a <noscript> child, so it is never :empty. Once scripts run
+   (the theme bootstrap sets data-theme) hide it unless a real message has been added. */
+[data-theme] #error-messages:not(:has(> :not(noscript))) {
     display: none;
 }
 
