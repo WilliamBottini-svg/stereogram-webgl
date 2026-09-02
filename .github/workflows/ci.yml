@@ -9,13 +9,16 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20, 22]
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: ${{ matrix.node-version }}
           cache: "npm"
 
       - name: Install dependencies
@@ -33,5 +36,5 @@ jobs:
       - name: Test
         run: npm test
 
-      - name: Build (webpack bundle)
-        run: npm run build:no-page
+      - name: Build (page, shaders, static assets, webpack bundle)
+        run: npm run build

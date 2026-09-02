@@ -21,6 +21,7 @@ This project is a fork of [piellardj/stereogram-webgl](https://github.com/piella
 | Fullscreen preview module (square / fill modes, browser fullscreen) — 265 LOC, new module at `src/ts/fullscreen-preview.ts` | [`3151aaf`](../../commit/3151aaf) |
 | Download-size selector (1024 / 2048 / 4096) and UI/attribution refactor | [`b727a86`](../../commit/b727a86) |
 | Service worker to handle stale registrations | [`3151aaf`](../../commit/3151aaf) |
+| Collapsible control sections, editable numeric fields and reset buttons next to every slider (`src/ts/ui-enhancements.ts`) | [`b727a86`](../../commit/b727a86) |
 
 ## Redesigned UI
 
@@ -40,7 +41,7 @@ The new design lives entirely in `src/static/css/custom.css` (loaded after the f
 
 Every numeric, boolean, and enum parameter is encoded into the URL hash, so any configuration is a copy-pasteable link. Click the **Copy link** button in the top-right corner to grab one.
 
-Design notes (the things I'd talk about in an interview):
+Design notes:
 
 - Compact `key=value&key=value` format in the hash (`#d=0.5&sc=12&tm=texture&...`) rather than base64-of-JSON. Human-readable, diffable, and unknown keys are silently ignored on decode so older links keep working as the schema grows.
 - Short keys (e.g. `d` for depth, `cu0`/`cu1` for tile-crop min/max U) keep URLs paste-friendly.
@@ -56,7 +57,7 @@ This fork adds the engineering infrastructure that wasn't in the original:
 
 - **ESLint flat config + Prettier** (the original used `tslint`, deprecated since 2019).
 - **Strict TypeScript**: `strict` + `strictNullChecks` on, ES2020 target.
-- **GitHub Actions CI** runs lint, format-check, typecheck, tests, and the webpack bundle on every push.
+- **GitHub Actions CI** runs lint, format-check, typecheck, tests, and the full build on Node 20 and 22 on every push.
 - **Vitest test suite** (70 tests) covering the pure logic — export-dimension math, the URL state codec — and the URL binding layer, where the `Page` framework and `Parameters` singleton are substituted with recording fakes so no browser is needed. See `src/ts/**/*.test.ts`.
 - **Husky pre-commit hook** runs lint + typecheck + tests locally before each commit.
 
@@ -64,7 +65,7 @@ This fork adds the engineering infrastructure that wasn't in the original:
 
 ## Run locally
 
-1. Install [Node.js](https://nodejs.org/) **18.16 or newer** (see `engines` in `package.json`).
+1. Install [Node.js](https://nodejs.org/) **20 or newer** (see `engines` in `package.json`; an `.nvmrc` is provided).
 2. From the project folder, install dependencies and build:
 
    ```bash
@@ -79,6 +80,12 @@ This fork adds the engineering infrastructure that wasn't in the original:
    ```
 
 To rebuild on source changes: run `npm run build` again, or `npm run webpack:watch` in another terminal alongside `http-server`.
+
+`npm run build` regenerates everything under `docs/` (the GitHub Pages site): the app page and the readme page from `src/generate-page.ts`, the shaders, the static assets, and the webpack bundle. `docs/` is committed, so commit the rebuilt output along with the source change that caused it. `npm run check` runs lint, format check, typecheck, and tests; the same checks run in CI and in the pre-commit hook.
+
+## Releases
+
+See [`CHANGELOG.md`](CHANGELOG.md) for what changed in each release.
 
 ## How a stereogram works
 
